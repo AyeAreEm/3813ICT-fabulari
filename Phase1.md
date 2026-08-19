@@ -46,11 +46,24 @@ Chatters can see a list of all existing groups for them to send a join request t
 - Messages are time stamped.
 - Users can update all their information except for their email. If a user forgets their password, they have to create a new account.
 
-## Strategy Outline
+## Git Strategy Outline
+### Branches
+All branches will be prefixed depending on the goal of the branch. The name of the branch will be [prefix]/[name].
+
+| Prefix | Definition |
+| ------ | ---------- |
+| feat | new feature |
+| bug | fixing a bug |
+| wip | work-in-progress |
+
+### Rebasing and Merging
+To keep a clean commit history, rebasing will be used in tandem with merging.
+Merging will occur for major feature and work-in-progress branches.
+Rebasing will occur for documents / non-technical changes as well as minor bug fixes.
 
 ## Specifications and Assumptions
 |  |  |
--------
+| - | - |
 |  |  |
 
 ## Data Structures
