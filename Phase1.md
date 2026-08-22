@@ -52,17 +52,16 @@ When refering to a specific requirement, the syntax (R[N]) will be used. For exa
 | 9 | Group Admin must appoint a successor before leaving or deleting their account | Only chatters of the same group are eligible |
 | 10 | Profile requires first name, last name, email, password, and age | Age is taken from date of birth for recalculation |
 | 11 | Members can request for another member to be banned from the group | Request has a reason field. Request goes to Group Admin where they can ask the Super Admin to ban the user from the app, ban them from the group, or deny the request |
-| 12 | Members can delete their previous messages | Previous messages (after the 5th) are cached in localStorage. Message is replaced with "message deleted" rather than completely removed from the UI |
+| 12 | Members can delete their previous messages | Previous messages (after the 5th) are cached in sessionStorage. Message is replaced with "message deleted" rather than completely removed from the UI |
 | 13 | Users can view a list of all existing groups | List shows title, description, age limit, but not the full member list |
 | 14 | Members entering a chat room see 5 previous messages | Database stores only 5 messages and continously updates using a Ring Buffer approach |
 | 15 | Members in a chat room are notified when another member enters or leaves said chat room | Notified with an inline message rather than push notification |
 | 16 | Media files (PNG, JPEG, GIF) must be <=2MB | Files over 2MB are rejected on the front-end for immediate feedback and re-validated server-side |
-| 17 | Markdown support in chat messages | Limited subset of markdown for security |
-| 18 | Internal links are hyperlinked, external are not | Server Side detection between internal and external links |
-| 19 | Passwords must be >= 8 characters with 1 uppercase character | Numbers and symbols need not be included |
-| 20 | Messages are timestamped | Timestamps are stored in UTC and displayed in the users' local timezone |
-| 21 | Users can update all their information except email | Passwords can be changed if user knows old password. They cannot reset their forgotten password |
-| 22 | All administrative actions are logged | Logs include userId, action, and timestamp. Visible only to the Super Admin |
+| 17 | Internal links are hyperlinked, external are not | Server Side detection between internal and external links |
+| 18 | Passwords must be >= 8 characters with 1 uppercase character | Numbers and symbols need not be included |
+| 19 | Messages are timestamped | Timestamps are stored in UTC and displayed in the users' local timezone |
+| 20 | Users can update all their information except email | Passwords can be changed if user knows old password. They cannot reset their forgotten password |
+| 21 | All administrative actions are logged | Logs include userId, action, and timestamp. Visible only to the Super Admin |
 
 ## Data Structures
 
@@ -71,16 +70,17 @@ When refering to a specific requirement, the syntax (R[N]) will be used. For exa
 | - | - | - |
 | id | UUID |  |
 | email | string, unique |  |
-| password | string | >= 8 chars, 1 uppercase (R19), hashed |
+| password | string | >= 8 chars, 1 uppercase (R18), hashed |
 
 ### User
 | Field | Type | Notes |
 | - | - | - |
 | id | UUID |  |
+| image | binary (png, jpg) |  |
 | firstName | string | (R10) |
 | lastName | string | (R10) |
-| email | string, unique | Cannot change after creation (R21) |
-| password | string | >= 8 chars, 1 uppercase (R19), hashed |
+| email | string, unique | Cannot change after creation (R20) |
+| password | string | >= 8 chars, 1 uppercase (R18), hashed |
 | dob | date | Date-of-birth for age (R10) |
 | isBanned | boolean | (R3) |
 
@@ -89,8 +89,8 @@ When refering to a specific requirement, the syntax (R[N]) will be used. For exa
 | - | - | - |
 | id | UUID |  |
 | adminId | UUID | References User.id |
-| title | string, <=30 chars, unique | Cannot change after creation (R21) |
-| description | string, <= 250 chars | Editable and logged (R7, R22) |
+| title | string, <=30 chars, unique | Cannot change after creation (R20) |
+| description | string, <= 250 chars | Editable and logged (R7, R21) |
 | minAge | int | (R4) |
 | bgColor | string | (R8), stored as a hexcode string |
 
@@ -115,10 +115,10 @@ When refering to a specific requirement, the syntax (R[N]) will be used. For exa
 | - | - | - |
 | id | UUID |  |
 | authorId | UUID | References User.id |
-| content | string | Sanitised (R17, R18) |
+| content | string | Sanitised (R17) |
 | image | binary (png, jpg, gif) <=2MB | (R16) |
 | isDeleted | boolean | (R12) |
-| timestamp | datetime | Stored in UTC (R20) |
+| timestamp | datetime | Stored in UTC (R19) |
 
 ### CreateGroupRequest
 | Field | Type | Notes |
@@ -181,7 +181,7 @@ MongoDB does not enforce foreign keys. All fields referencing another collection
 ### Unique Indexes
 | Collection | Field | Notes |
 | - | - | - |
-| User | email | (R21) |
+| User | email | (R20) |
 | Group | title | (R4) |
 | Membership | {userId, groupId} (compound) | Prevents duplicate membership rows. Supports fast lookup for (R5, R6, R9, R11) |
 
@@ -205,12 +205,75 @@ Enforced via MongoDB JSON Schema validators on each collection.
 
 ## Angular Architecture
 ### Components
+All components will before postfixed with "Component" in the codebase.
+| Component | Description |
+| --------- | ----------- |
+| Home | Landing page that talks about Fabulari and links to the application |
+| SignUp    | Page with first name, last name, DOB, email, password, confirm password |
+| Login     | Page with email and password |
+| Profile   | Page with profile picture, first name, last name, email |
+| ChangePassword | Inputs with "current password", "new password", "confirm new password" |
+| Sidebar | Role-dependent sidebar showing joined groups for members and group admins, for super admin it shows buttons for each kind of request |
+| GroupList | Shows a list of existing groups to join |
+| GroupDetail | Shows a specific groups title, description, age limit |
+| RoomList | Shows list of rooms in current group |
+| MemberList | Shows all members of group |
+| ChatRoom | Main chat view containing messages, mesage input |
+| Message | Single message |
+| MessageInput | Text input and image upload |
+| UserInOutNotification | Inline notification showing "user joined" or "user left" |
+| GroupSettings | Edit description, pick background colour, delete group / appoint successor |
+| JoinFormRequest | Form to join a group |
+| KickFormRequest | Form to ban another user in a group |
+| BanFormRequest | Form to ban another user from the app |
+| CreateGroupRequests | Pending requests for create group (User - Super Admin) |
+| CreateGroupRequest | Single request for create group |
+| DeleteGroupRequests | Pending requests for delete group (Super Admin) |
+| DeleteGroupRequest | Single request for delete group |
+| JoinRequests | Pending requests for joining group (Group Admin) |
+| JoinRequest | Single request for join group |
+| KickRequests| Pending requests for banning a user from a group (User - Group Admin) |
+| KickRequests | Single request for banning a user from a group |
+| BanRequests | Pending requests for banning a user from the app (Group Admin - Super Admin) |
+| BanRequests | Single request for banning a user from the app |
+| Logs | Table of all admin logs |
+| Popup | Displays a component within itself on top of the UI |
+| NotFound
 
 ### Services
-
-### Models
+All services (except for guards) will be postfixed with "Service" in the codebase.
+| Service | Description |
+| ------- | ----------- |
+| AuthGuard | Guard against chatting without being logged in |
+| RoleGuard | Guard against users accessing role restricted features |
+| Timezone | Converts UTC to local timezone |
+| MediaUpload | Validates file type and size |
+| Requests | CRUD requests |
+| Logs | CRUD logs |
+| Messages | CRUD messages |
+| Groups | CRUD groups |
+| Room | CRUD rooms |
 
 ### Routes
+| Path | Component(s) | Guard(s) |
+| ---- | ------------ | -------- |
+| /    | Home         |  |
+| /login | Login      |  |
+| /signup | SignUp    |  |
+| /profile | Profile  | AuthGuard |
+| /change-password | ChangePassword | AuthGuard |
+| /groups | Sidebar, GroupList | AuthGuard |
+| /groups/:groupId | Sidebar, RoomList, GroupDetail, MemberList (if joined), JoinFormRequest (if not joined) | AuthGuard |
+| /groups/:groupId/settings | Sidebar, RoomList, GroupSettings | AuthGuard, RoleGuard |
+| /groups/:groupId/admin | JoinRequests, KickRequests | AuthGuard, RoleGuard |
+| /groups/:groupId/rooms/:roomsId | Sidebar, ChatRoom | AuthGuard, RoleGuard |
+| /groups/:groupId/kick | Sidebar, KickFormRequest | AuthGuard, RoleGuard |
+| /groups/:groupId/ban | Sidebar, BanFormRequest | AuthGuard, RoleGuard |
+| /admin | Sidebar(CreateGroupRequests, DeleteGroupRequests, BanRequests, Logs) (sidebar of buttons) |
+| /admin/create | Sidebar, CreateGroupRequests, Popup(CreateGroupRequests) |
+| /admin/delete | Sidebar, DeleteGroupRequests, Popup(DeleteGroupRequest) |
+| /admin/ban | Sidebar, BanRequests, Popup(BanRequest) |
+| /admin/logs | Sidebar, Logs, Popup(Log) |
 
 ## Endpoints
 
