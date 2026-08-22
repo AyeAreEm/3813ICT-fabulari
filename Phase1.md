@@ -238,7 +238,7 @@ All components will before postfixed with "Component" in the codebase.
 | BanRequests | Single request for banning a user from the app |
 | Logs | Table of all admin logs |
 | Popup | Displays a component within itself on top of the UI |
-| NotFound
+| NotFound | Shown on 404 |
 
 ### Services
 All services (except for guards) will be postfixed with "Service" in the codebase.
@@ -270,22 +270,22 @@ All services (except for guards) will be postfixed with "Service" in the codebas
 | /groups/:groupId/kick | Sidebar, KickFormRequest | AuthGuard, RoleGuard |
 | /groups/:groupId/ban | Sidebar, BanFormRequest | AuthGuard, RoleGuard |
 | /admin | Sidebar(CreateGroupRequests, DeleteGroupRequests, BanRequests, Logs) (sidebar of buttons) |
-| /admin/create | Sidebar, CreateGroupRequests, Popup(CreateGroupRequests) |
-| /admin/delete | Sidebar, DeleteGroupRequests, Popup(DeleteGroupRequest) |
-| /admin/ban | Sidebar, BanRequests, Popup(BanRequest) |
-| /admin/logs | Sidebar, Logs, Popup(Log) |
+| /admin/create | Sidebar, CreateGroupRequests, Popup(CreateGroupRequests) | AuthGuard, RoleGuard |
+| /admin/delete | Sidebar, DeleteGroupRequests, Popup(DeleteGroupRequest) | AuthGuard, RoleGuard |
+| /admin/ban | Sidebar, BanRequests, Popup(BanRequest) | AuthGuard, RoleGuard |
+| /admin/logs | Sidebar, Logs, Popup(Log) | AuthGuard, RoleGuard |
 
 ## Endpoints
 
 ## Design Documents
 ### Login
-![login page](/storyboard/login.png)
+![login page](storyboard/login.png)
 
 ### Signup
-![signup page](/storyboard/signup.png)
+![signup page](storyboard/signup.png)
 
 ### Profile
-![profile page](/storyboard/profile.png)
+![profile page](storyboard/profile.png)
 
 ### Change Password
-![change password](/storyboard/change_password.png)
+![change password](storyboard/change_password.png)
