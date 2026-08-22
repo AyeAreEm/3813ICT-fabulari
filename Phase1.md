@@ -278,3 +278,14 @@ All services (except for guards) will be postfixed with "Service" in the codebas
 ## Endpoints
 
 ## Design Documents
+### Login
+![login page](/storyboard/login.png)
+
+### Signup
+![signup page](/storyboard/signup.png)
+
+### Profile
+![profile page](/storyboard/profile.png)
+
+### Change Password
+![change password](/storyboard/change_password.png)
