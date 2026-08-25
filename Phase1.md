@@ -63,6 +63,7 @@ When refering to a specific requirement, the syntax (R[N]) will be used. For exa
 | 20 | Users can update all their information except email | Passwords can be changed if user knows old password. They cannot reset their forgotten password |
 | 21 | All administrative actions are logged | Logs include userId, action, and timestamp. Visible only to the Super Admin |
 | 22 | Rooms display a list of users currently in the room | Presence is tracked server-side in memory (not MongoDB) and pushed to clients via WebSocket |
+| 23 | Members can request for a new room to be created in a group | Request has a room name and reason |
 
 ## Data Structures
 
@@ -146,6 +147,16 @@ When refering to a specific requirement, the syntax (R[N]) will be used. For exa
 | reason | string |  |
 | status | enum | pending, approved, denied (R2) |
 
+### CreateRoomRequest
+| Field | Type | Notes |
+| - | - | - |
+| id | UUID |  |
+| requestorId | UUID | References User.id |
+| groupId | UUID | References Group.id |
+| roomName | string | (R23) |
+| reason | string | (R23) |
+| status | enum | pending, approved, denied (R23) |
+
 ### JoinRequest
 | Field | Type | Notes |
 | - | - | - |
@@ -201,6 +212,7 @@ Enforced via MongoDB JSON Schema validators on each collection.
 | Membership | status | active, banned |
 | CreateGroupRequest | status | pending, approved, denied |
 | DeleteGroupRequest | status | pending, approved, denied |
+| CreateRoomRequest | status | pending, approved, denied |
 | JoinRequest | status | pending, approved, denied |
 | KickRequest | status | pending, approved, denied |
 | BanRequest | status | pending, approved, denied |
@@ -232,6 +244,7 @@ All components will before postfixed with "Component" in the codebase.
 | MessageInput | Text input and image upload |
 | UserInOutNotification | Inline notification showing "user joined" or "user left" |
 | GroupSettings | Edit description, pick background colour, delete group / appoint successor |
+| CreateRoomFormRequest | Form to create a room |
 | JoinFormRequest | Form to join a group |
 | KickFormRequest | Form to ban another user in a group |
 | BanFormRequest | Form to ban another user from the platform |
@@ -239,6 +252,8 @@ All components will before postfixed with "Component" in the codebase.
 | CreateGroupRequest | Single request for create group |
 | DeleteGroupRequests | Pending requests for delete group (Super Admin) |
 | DeleteGroupRequest | Single request for delete group |
+| CreateRoomRequests | Pending requests for create room (Group Admin) |
+| CreateRoomRequest | Single request for create room |
 | JoinRequests | Pending requests for joining group (Group Admin) |
 | JoinRequest | Single request for join group |
 | KickRequests| Pending requests for banning a user from a group (User - Group Admin) |
@@ -275,7 +290,8 @@ All services (except for guards) will be postfixed with "Service" in the codebas
 | /groups | Sidebar, GroupList | AuthGuard |
 | /groups/:groupId | Sidebar, RoomList, GroupDetail, MemberList (if joined), JoinFormRequest (if not joined) | AuthGuard |
 | /groups/:groupId/settings | Sidebar, RoomList, GroupSettings | AuthGuard, RoleGuard |
-| /groups/:groupId/admin | JoinRequests, KickRequests | AuthGuard, RoleGuard |
+| /groups/:groupId/admin | JoinRequests, CreateRoomRequests, KickRequests | AuthGuard, RoleGuard |
+| /groups/:groupId/rooms/create | Sidebar, CreateRoomFormRequest | AuthGuard |
 | /groups/:groupId/rooms/:roomsId | Sidebar, ChatRoom, RoomUserList | AuthGuard, RoleGuard |
 | /groups/:groupId/kick | Sidebar, KickFormRequest | AuthGuard, RoleGuard |
 | /groups/:groupId/ban | Sidebar, BanFormRequest | AuthGuard, RoleGuard |
@@ -348,6 +364,13 @@ All services (except for guards) will be postfixed with "Service" in the codebas
 | /groups/:groupId/rooms/:roomId | delete | Delete a room |
 | /groups/:groupId/rooms/:roomId/presence | get | On room load, get current presence |
 
+### Room Requests
+| Endpoint | Method | Description |
+| -------- | ------ | ----------- |
+| /groups/:groupId/room-requests | post | Submit a request to create a room |
+| /groups/:groupId/room-requests | get | Pending requests for Group Admin |
+| /groups/:groupId/room-requests/:id | patch | Approve or deny create room request |
+
 ### Messages
 | Endpoint | Method | Description |
 | -------- | ------ | ----------- |
@@ -372,8 +395,12 @@ All services (except for guards) will be postfixed with "Service" in the codebas
 | `message:deleted` | Broadcast delete |
 | `room:userJoined` | Broadcast and notify when a user joins a room |
 | `room:userLeft` | Broadcast and notify when a user leaves a room |
+| `room:created` | Broadcast when a Group Admin approves room creation |
 
 ## Design Documents
+### Home
+![home page](storyboards/home.png)
+
 ### Login
 ![login page](storyboards/login.png)
 
@@ -385,3 +412,23 @@ All services (except for guards) will be postfixed with "Service" in the codebas
 
 ### Change Password
 ![change password](storyboards/change_password.png)
+
+### Groups
+![browse groups](storyboards/browse_groups.png)
+![group join](storyboards/group_join.png)
+![group details](storyboards/group_details.png)
+![group settings](storyboards/group_settings.png)
+![group requests](storyboards/group_requests.png)
+
+### Room
+![room](storyboards/room.png)
+
+### Request Forms
+![kick request](storyboards/kick_request.png)
+![ban request](storyboards/ban_request.png)
+
+### Super Admin
+![create group requests](storyboards/create_room_requests.png)
+![delete group requests](storyboards/delete_room_requests.png)
+![ban requests](storyboards/ban_requests.png)
+![logs](storyboards/logs.png)
