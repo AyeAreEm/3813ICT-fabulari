@@ -428,7 +428,7 @@ All services (except for guards) will be postfixed with "Service" in the codebas
 ![ban request](storyboards/ban_request.png)
 
 ### Super Admin
-![create group requests](storyboards/create_room_requests.png)
-![delete group requests](storyboards/delete_room_requests.png)
+![create group requests](storyboards/create_group_requests.png)
+![delete group requests](storyboards/delete_group_requests.png)
 ![ban requests](storyboards/ban_requests.png)
 ![logs](storyboards/logs.png)
