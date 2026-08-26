@@ -1,1 +1,158 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&display=swap');
+
+:root {
+  --fab-bg: #f5f4f1;
+  --fab-ink: #262a3f;
+  --fab-card: #ffffff;
+  --fab-border: #e2e0db;
+  --fab-blue: #6fa4d8;
+  --fab-yellow: #ecb64d;
+  --fab-coral: #e2705e;
+  --fab-muted: #8a8d99;
+}
+
+body {
+  background: var(--fab-bg);
+  color: var(--fab-ink);
+  font-family: 'Fraunces', system-ui, sans-serif;
+}
+
+/* Buttons */
+.btn-fab-dark {
+  background: var(--fab-ink);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 0.65rem 1.5rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  transition: opacity .15s ease;
+}
+.btn-fab-dark:hover { opacity: .85; color: #fff; }
+
+.btn-fab-light {
+  background: #fff;
+  color: var(--fab-ink);
+  border: 1px solid var(--fab-border);
+  border-radius: 10px;
+  padding: 0.65rem 1.5rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+.btn-fab-light:hover { background: #f8f8f6; color: var(--fab-ink); }
+
+/* Inputs */
+.fab-input {
+  border: 1px solid var(--fab-border);
+  border-radius: 8px;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.95rem;
+}
+.fab-input:focus {
+  border-color: var(--fab-ink);
+  box-shadow: 0 0 0 3px rgba(38, 42, 63, 0.08);
+}
+
+.fab-input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.fab-input-group .fab-input { flex: 1; padding-right: 2.5rem; }
+.fab-input-icon {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: var(--fab-muted);
+  display: flex;
+  align-items: center;
+}
+
+/* Auth card (login / signup) */
+.fab-card {
+  background: var(--fab-card);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  padding: 2.5rem 2.25rem;
+  width: 100%;
+  max-width: 420px;
+}
+.fab-card img {
+  display: block;
+  margin: 0 auto;
+}
+.fab-card__title {
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 1.5rem 0 1.5rem;
+}
+.fab-card__footer {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--fab-muted);
+  margin-top: 1.25rem;
+
+  a { color: #4DA8FF; font-weight: 600; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+}
+/* Disabled input (read-only email on profile) */
+.fab-input:disabled {
+  background: #f2f2f0;
+  color: var(--fab-muted);
+}
+
+/* Standalone centered link (Change password / Back to profile) */
+.fab-link-center {
+  display: block;
+  text-align: center;
+  margin-top: 1.25rem;
+  color: #3b6fd6;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 0.9rem;
+  background: none;
+  border: none;
+  width: 100%;
+}
+.fab-link-center:hover { text-decoration: underline; }
+
+/* Avatar upload */
+.fab-avatar-wrap {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 1.75rem;
+}
+.fab-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: #eceae6;
+  color: var(--fab-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  img { width: 100%; height: 100%; object-fit: cover; }
+}
+.fab-avatar-badge {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--fab-ink);
+  border: 2px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
