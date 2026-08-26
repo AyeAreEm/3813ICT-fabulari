@@ -276,3 +276,115 @@ body {
   background: #fff; color: #c0392b; border: 1px solid #c0392b; border-radius: 8px; padding: 0.5rem 1.1rem; font-weight: 600;
 }
 .btn-fab-danger-outline:hover { background: #fdf1ef; }
+
+/* Room layout */
+.fab-room-layout { display: flex; flex: 1; min-height: 0; }
+.fab-room-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.fab-room-header { padding: 1.5rem 2rem 1rem; border-bottom: 1px solid var(--fab-border); }
+.fab-room-title { font-weight: 700; font-size: 1.3rem; margin: 0 0 0.25rem; }
+.fab-room-desc { color: var(--fab-muted); font-size: 0.9rem; margin: 0; }
+
+.fab-room-messages { flex: 1; overflow-y: auto; padding: 1.5rem 2rem; display: flex; flex-direction: column; gap: 1.25rem; }
+.fab-message { display: flex; gap: 0.75rem; }
+.fab-message__meta { display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.15rem; }
+.fab-message__author { font-weight: 700; font-size: 0.92rem; }
+.fab-message__time { font-size: 0.78rem; color: var(--fab-muted); }
+.fab-message__text { margin: 0; font-size: 0.92rem; color: #333; }
+
+.fab-room-composer {
+  display: flex; align-items: center; gap: 0.6rem;
+  margin: 1rem 2rem 1.5rem;
+  background: #f2f1ee;
+  border-radius: 24px;
+  padding: 0.5rem 0.6rem 0.5rem 1rem;
+}
+.fab-composer-icon { background: none; border: none; color: var(--fab-muted); display: flex; align-items: center; }
+.fab-composer-input { flex: 1; border: none; background: transparent; outline: none; font-size: 0.92rem; padding: 0.35rem 0; }
+.fab-composer-send {
+  width: 32px; height: 32px; border-radius: 50%; background: var(--fab-ink);
+  border: none; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+
+.fab-users-panel { width: 220px; flex-shrink: 0; border-left: 1px solid var(--fab-border); padding: 1.5rem 1.25rem; overflow-y: auto; }
+.fab-user-row { margin-bottom: 1rem; }
+.fab-user-name { font-weight: 600; font-size: 0.92rem; }
+.fab-user-role { font-size: 0.78rem; color: var(--fab-muted); }
+/* Group requests */
+.fab-request-card { background: #fff; border: 1px solid var(--fab-border); border-radius: 14px; padding: 1.5rem 1.75rem; margin-bottom: 1.25rem; }
+.fab-request-title { font-weight: 700; font-size: 1.05rem; margin: 0; }
+.fab-request-date { font-size: 0.82rem; color: var(--fab-muted); white-space: nowrap; }
+.fab-request-message { color: #444; font-size: 0.92rem; margin-bottom: 1.1rem; }
+.btn-fab-danger { background: #e2705e; color: #fff; border: none; border-radius: 10px; padding: 0.65rem 1.5rem; font-weight: 600; }
+.btn-fab-danger:hover { opacity: 0.9; }
+
+/* Modal detail blocks (reused by all admin review modals) */
+.fab-modal-close { background: none; border: none; font-size: 1.4rem; line-height: 1; color: var(--fab-muted); cursor: pointer; }
+.fab-detail-block { margin-bottom: 1.1rem; }
+.fab-detail-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fab-muted); font-weight: 700; margin-bottom: 0.25rem; }
+.fab-detail-value { font-size: 0.95rem; }
+.btn-fab-reject { background: #fff; color: #c0392b; border: 1px solid var(--fab-border); border-radius: 10px; padding: 0.65rem 1.5rem; font-weight: 600; }
+.btn-fab-reject:hover { background: #fdf1ef; }
+
+/* Admin console shell */
+.fab-admin-shell { min-height: 100vh; background: #cfcecb; }
+.fab-admin-topbar { display: flex; align-items: center; justify-content: space-between; padding: 1.5rem 2rem; }
+.fab-admin-topbar__title { font-size: 1.6rem; font-weight: 800; margin: 0; }
+.fab-admin-topbar__user { display: flex; align-items: center; gap: 0.65rem; }
+.fab-admin-topbar__name { font-weight: 700; font-size: 0.9rem; }
+.fab-admin-topbar__sub { font-size: 0.78rem; color: #555; }
+.fab-avatar-sm--dark { background: #b8b7b3; }
+
+.fab-admin-body { display: flex; padding: 0 2rem 2rem; gap: 2rem; }
+.fab-admin-sidebar { width: 220px; flex-shrink: 0; background: #e4e3e0; border-radius: 14px; padding: 1.5rem 1rem; height: fit-content; }
+.fab-admin-nav { margin-top: 0; display: flex; flex-direction: column; gap: 0.15rem; }
+.fab-admin-nav__item { display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem 0.7rem; border-radius: 8px; color: #333; text-decoration: none; font-weight: 600; font-size: 0.88rem; }
+.fab-admin-nav__item:hover { background: #d7d6d2; }
+.fab-admin-nav__item.active { background: #c9c8c4; }
+
+.fab-admin-main { flex: 1; min-width: 0; }
+.fab-admin-list-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.5rem; }
+.fab-admin-list-title { font-size: 1.6rem; font-weight: 800; margin: 0; }
+.fab-admin-list-sub { color: #555; font-size: 0.88rem; }
+
+.fab-admin-card { background: #e4e3e0; border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; cursor: pointer; }
+.fab-admin-card__meta { font-size: 0.82rem; color: #555; margin-bottom: 0.25rem; }
+.fab-admin-card__title { font-weight: 700; margin-bottom: 0.25rem; }
+.fab-admin-card__title--danger { color: #c0392b; }
+.fab-admin-card__msg { color: #555; font-size: 0.88rem; margin: 0; }
+.fab-admin-card__actions { display: flex; gap: 0.6rem; flex-shrink: 0; }
+
+.btn-fab-outline-muted { background: #fff; color: #333; border: 1px solid #b9b8b4; border-radius: 8px; padding: 0.5rem 1.1rem; font-weight: 600; }
+.btn-fab-outline-muted:hover { background: #f1f0ee; }
+
+/* Audit log table */
+.fab-log-table { background: #e4e3e0; border-radius: 12px; overflow: hidden; }
+.fab-log-row { display: grid; grid-template-columns: 180px 200px 1fr; gap: 1rem; padding: 0.9rem 1.5rem; border-bottom: 1px solid #d3d2ce; font-size: 0.88rem; color: #333; }
+.fab-log-row:last-child { border-bottom: none; }
+.fab-log-row--head { text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.05em; color: #666; font-weight: 700; background: #dcdbd8; }
+.fab-log-row:not(.fab-log-row--head):hover { background: #dcdbd8; cursor: pointer; }
+
+.fab-group-card--create {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border: 1.5px dashed var(--fab-border);
+  background: #fbfaf8;
+  cursor: pointer;
+  gap: 0.75rem;
+}
+.fab-group-card--create:hover { background: #f5f4f1; }
+.fab-create-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #eceae6;
+  color: var(--fab-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fab-create-text {
+  color: var(--fab-muted);
+  font-size: 0.88rem;
+  margin: 0;
+}

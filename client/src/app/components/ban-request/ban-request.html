@@ -1,0 +1,28 @@
+<div class="d-flex align-items-center justify-content-center py-5 px-3">
+  <div class="fab-card">
+    <h2 class="fab-serif fw-bold mb-1">Request Platform Ban</h2>
+    <p class="text-muted mb-4">Submit a platform-wide ban request. Requires severe violation of global policies.</p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="mb-3">
+        <label class="form-label">User to ban:</label>
+        <input class="form-control fab-input" formControlName="userToBan" />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Request from:</label>
+        <input class="form-control fab-input" formControlName="requestFrom" />
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label">Reason for escalation</label>
+        <textarea class="form-control fab-input" rows="4" formControlName="reason"
+                  placeholder="Provide detail regarding severe violations, terms of service breaches, or malicious behaviors…"></textarea>
+      </div>
+
+      <button type="submit" class="btn-fab-dark w-100">Submit Request</button>
+    </form>
+
+    <p class="text-center text-muted mt-3 mb-0 small">This request will be reviewed by the Super Admin.</p>
+  </div>
+</div>

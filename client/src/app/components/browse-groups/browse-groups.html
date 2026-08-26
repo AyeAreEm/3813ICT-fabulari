@@ -1,5 +1,15 @@
-<app-shell pageTitle="Browse Groups" userInitials="JD" [groups]="myGroups">
+<app-shell [groups]="myGroups">
   <div class="fab-groups-grid">
+    <div class="fab-group-card fab-group-card--create" role="button" (click)="openCreateModal()">
+      <div class="fab-create-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </div>
+      <p class="fab-create-text">Start a new community and invite others to join</p>
+      <button type="button" class="btn-fab-dark w-100">Create A Group</button>
+    </div>
+
     <app-group-card *ngFor="let g of allGroups" [group]="g" (action)="onCardAction(g)"></app-group-card>
   </div>
 </app-shell>
@@ -20,4 +30,37 @@
   </div>
 
   <button type="button" class="btn-fab-dark w-100" (click)="sendJoinRequest()">Send Join Request</button>
+</app-modal>
+
+<app-modal *ngIf="showCreateModal" (closed)="closeCreateModal()">
+  <h2 class="fab-serif fw-bold mb-1">Create a Group</h2>
+  <p class="text-muted mb-4">Propose a new community. New groups are reviewed by the Super Admin before they go live.</p>
+
+  <form [formGroup]="createForm" (ngSubmit)="submitCreateGroup()" novalidate>
+    <div class="mb-3">
+      <label class="form-label">Group title</label>
+      <input class="form-control fab-input" formControlName="title" placeholder="e.g. Creative Designers" />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Description</label>
+      <textarea class="form-control fab-input" rows="3" formControlName="description"
+                placeholder="What is this group about?"></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Reason for creating</label>
+      <textarea class="form-control fab-input" rows="3" formControlName="reason"
+                placeholder="Why does this community need its own space?"></textarea>
+    </div>
+
+    <div class="mb-4">
+      <label class="form-label">Minimum age</label>
+      <input type="number" class="form-control fab-input" formControlName="minAge" min="0" max="99" />
+    </div>
+
+    <button type="submit" class="btn-fab-dark w-100">Submit Request</button>
+  </form>
+
+  <p class="text-center text-muted mt-3 mb-0 small">This request will be reviewed by the Super Admin.</p>
 </app-modal>

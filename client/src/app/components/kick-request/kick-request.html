@@ -1,0 +1,25 @@
+<div class="d-flex align-items-center justify-content-center py-5 px-3">
+  <div class="fab-card">
+    <h2 class="fab-serif fw-bold mb-1">Request Member Kick</h2>
+    <p class="text-muted mb-4">Initiate a formal kick request for review by the community administrators.</p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="mb-3">
+        <label class="form-label">Select Group Member</label>
+        <select class="form-select fab-input" formControlName="memberId">
+          <option *ngFor="let m of members" [value]="m.id">{{ m.name }}</option>
+        </select>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label">Reason</label>
+        <textarea class="form-control fab-input" rows="4" formControlName="reason"
+                  placeholder="Describe the reason for requesting a kick from the group…"></textarea>
+      </div>
+
+      <button type="submit" class="btn-fab-dark w-100">Submit Request</button>
+    </form>
+
+    <p class="text-center text-muted mt-3 mb-0 small">This request will be reviewed by the Group Admin.</p>
+  </div>
+</div>

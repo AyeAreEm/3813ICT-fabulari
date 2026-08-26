@@ -1,0 +1,47 @@
+<app-admin-shell>
+  <div class="fab-admin-list-header">
+    <h2 class="fab-admin-list-title fab-serif">Delete Requests</h2>
+    <span class="fab-admin-list-sub">{{ requests.length }} requests pending action</span>
+  </div>
+
+  <div class="fab-admin-card" *ngFor="let r of requests" (click)="view(r)" role="button">
+    <div>
+      <div class="fab-admin-card__meta">{{ r.requesterName }} &middot; {{ r.date }}</div>
+      <div class="fab-admin-card__title fab-admin-card__title--danger">{{ r.groupName }}</div>
+      <p class="fab-admin-card__msg">&ldquo;{{ r.reason }}&rdquo;</p>
+    </div>
+    <div class="fab-admin-card__actions" (click)="$event.stopPropagation()">
+      <button type="button" class="btn-fab-dark" (click)="view(r)">Approve</button>
+      <button type="button" class="btn-fab-outline-muted" (click)="deny(r)">Deny</button>
+    </div>
+  </div>
+
+  <p *ngIf="!requests.length" class="text-muted">No pending deletion requests.</p>
+</app-admin-shell>
+
+<app-modal *ngIf="selected as r" (closed)="close()" maxWidth="520px">
+  <div class="d-flex justify-content-between align-items-start mb-3">
+    <h2 class="fab-serif fw-bold mb-0">Confirm Group Deletion</h2>
+    <button type="button" class="fab-modal-close" (click)="close()" aria-label="Close">&times;</button>
+  </div>
+
+  <div class="fab-danger-box mb-3">
+    <div class="fab-danger-title mb-1">Warning: Action is Permanent</div>
+    <div class="text-muted small">All chat history, media assets, and membership records will be destroyed.</div>
+  </div>
+
+  <div class="fab-detail-block">
+    <div class="fab-detail-label">Group Target</div>
+    <div class="fab-detail-value fab-serif fs-4 fw-bold">{{ r.groupName }}</div>
+  </div>
+
+  <div class="fab-detail-block">
+    <div class="fab-detail-label">Deletion Reason</div>
+    <div class="fab-detail-value text-muted">&ldquo;{{ r.reason }}&rdquo;</div>
+  </div>
+
+  <div class="d-flex gap-2 mt-4">
+    <button type="button" class="btn-fab-danger flex-fill" (click)="confirmDelete(r)">Confirm Delete</button>
+    <button type="button" class="btn-fab-light flex-fill" (click)="close()">Cancel</button>
+  </div>
+</app-modal>

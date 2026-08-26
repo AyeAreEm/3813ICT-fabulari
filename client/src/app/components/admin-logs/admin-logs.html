@@ -1,0 +1,43 @@
+<app-admin-shell>
+  <div class="fab-admin-list-header">
+    <h2 class="fab-admin-list-title fab-serif">Audit Logs</h2>
+    <span class="fab-admin-list-sub">Showing latest activity</span>
+  </div>
+
+  <div class="fab-log-table">
+    <div class="fab-log-row fab-log-row--head">
+      <span>Date/Time</span>
+      <span>Actor</span>
+      <span>Action</span>
+    </div>
+    <div class="fab-log-row" *ngFor="let l of logs" (click)="view(l)" role="button">
+      <span>{{ l.dateTime }}</span>
+      <span class="fw-bold">{{ l.actor }}</span>
+      <span>{{ l.action }}</span>
+    </div>
+  </div>
+</app-admin-shell>
+
+<app-modal *ngIf="selected as l" (closed)="close()" maxWidth="520px">
+  <div class="d-flex justify-content-between align-items-start mb-3">
+    <h2 class="fab-serif fw-bold mb-0">Audit Log Details</h2>
+    <button type="button" class="fab-modal-close" (click)="close()" aria-label="Close">&times;</button>
+  </div>
+
+  <div class="fab-detail-block">
+    <div class="fab-detail-label">Log Timestamp</div>
+    <div class="fab-detail-value">{{ l.dateTime }}</div>
+  </div>
+
+  <div class="fab-detail-block">
+    <div class="fab-detail-label">Action Performed</div>
+    <div class="fab-detail-value fw-bold">{{ l.action }}</div>
+  </div>
+
+  <div class="fab-detail-block">
+    <div class="fab-detail-label">Audit Metadata</div>
+    <div class="fab-detail-value text-muted">&ldquo;{{ l.metadata }}&rdquo;</div>
+  </div>
+
+  <button type="button" class="btn-fab-dark w-100 mt-2" (click)="close()">Close Log Entry</button>
+</app-modal>

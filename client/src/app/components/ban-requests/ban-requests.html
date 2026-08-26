@@ -1,0 +1,47 @@
+<app-admin-shell>
+  <div class="fab-admin-list-header">
+    <h2 class="fab-admin-list-title fab-serif">Ban Requests</h2>
+    <span class="fab-admin-list-sub">{{ requests.length }} pending moderation flags</span>
+  </div>
+
+  <div class="fab-admin-card" *ngFor="let r of requests" (click)="view(r)" role="button">
+    <div>
+      <div class="fab-admin-card__meta">Proposed by: {{ r.proposedByName }} ({{ r.proposedByRole }}) &middot; {{ r.date }}</div>
+      <div class="fab-admin-card__title">Ban Target: {{ r.targetName }}</div>
+      <p class="fab-admin-card__msg">&ldquo;{{ r.evidence }}&rdquo;</p>
+    </div>
+    <div class="fab-admin-card__actions" (click)="$event.stopPropagation()">
+      <button type="button" class="btn-fab-dark" (click)="view(r)">Approve</button>
+      <button type="button" class="btn-fab-outline-muted" (click)="deny(r)">Deny</button>
+    </div>
+  </div>
+
+  <p *ngIf="!requests.length" class="text-muted">No pending ban requests.</p>
+</app-admin-shell>
+
+<app-modal *ngIf="selected as r" (closed)="close()" maxWidth="520px">
+  <div class="d-flex justify-content-between align-items-start mb-3">
+    <h2 class="fab-serif fw-bold mb-0">User Ban Review</h2>
+    <button type="button" class="fab-modal-close" (click)="close()" aria-label="Close">&times;</button>
+  </div>
+
+  <div class="fab-detail-block">
+    <div class="fab-detail-label">Target User ID</div>
+    <div class="fab-detail-value fw-bold">{{ r.targetName }} (ID: #{{ r.targetId }})</div>
+  </div>
+
+  <div class="fab-detail-block">
+    <div class="fab-detail-label">Requested By</div>
+    <div class="fab-detail-value">{{ r.proposedByName }} ({{ r.proposedByRole }})</div>
+  </div>
+
+  <div class="fab-detail-block">
+    <div class="fab-detail-label">Infraction Evidence</div>
+    <div class="fab-detail-value text-muted">&ldquo;{{ r.evidence }}&rdquo;</div>
+  </div>
+
+  <div class="d-flex gap-2 mt-4">
+    <button type="button" class="btn-fab-danger flex-fill" (click)="banUser(r)">Ban User</button>
+    <button type="button" class="btn-fab-light flex-fill" (click)="dismissFlag(r)">Dismiss Flag</button>
+  </div>
+</app-modal>

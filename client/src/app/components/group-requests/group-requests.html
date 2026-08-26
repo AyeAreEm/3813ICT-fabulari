@@ -1,0 +1,25 @@
+<app-shell [groups]="myGroups" [activeGroupId]="group?.id ?? null" *ngIf="group">
+  <div class="fab-details-layout">
+    <app-group-nav [groupId]="group.id" [rooms]="rooms" [activeRoomId]="null"></app-group-nav>
+
+    <div class="fab-details-main">
+      <h1 class="fab-serif fab-details-title">Requests</h1>
+      <p class="fab-details-desc mb-4">Review pending join and community moderation requests</p>
+
+      <div class="fab-request-card" *ngFor="let r of requests">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <h3 class="fab-request-title">{{ typeLabel(r.type) }}: {{ r.subjectName }}</h3>
+          <span class="fab-request-date">{{ r.date }}</span>
+        </div>
+        <p class="fab-request-message">&ldquo;{{ r.message }}&rdquo;</p>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn-fab-dark flex-fill" (click)="approve(r)">Approve</button>
+          <button type="button" *ngIf="r.type === 'kick'" class="btn-fab-danger flex-fill" (click)="ban(r)">Ban</button>
+          <button type="button" class="btn-fab-light flex-fill" (click)="deny(r)">Deny</button>
+        </div>
+      </div>
+
+      <p *ngIf="!requests.length" class="text-muted">No pending requests right now.</p>
+    </div>
+  </div>
+</app-shell>

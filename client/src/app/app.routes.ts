@@ -6,6 +6,14 @@ import { ProfileComponent } from './components/profile/profile';
 import { ChangePasswordComponent } from './components/change-password/change-password';
 import { BrowseGroupsComponent } from './components/browse-groups/browse-groups';
 import { GroupDetailsComponent } from './components/group-details/group-details';
+import { RoomComponent } from './components/room/room';
+import { GroupRequestsComponent } from './components/group-requests/group-requests';
+import { KickRequestComponent } from './components/kick-request/kick-request';
+import { BanRequestComponent } from './components/ban-request/ban-request';
+import { CreateGroupRequestsComponent } from './components/create-group-requests/create-group-requests';
+import { DeleteGroupRequestsComponent } from './components/delete-group-requests/delete-group-requests';
+import { BanRequestsComponent } from './components/ban-requests/ban-requests';
+import { AdminLogsComponent } from './components/admin-logs/admin-logs';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -15,4 +23,13 @@ export const routes: Routes = [
   { path: 'change-password', component: ChangePasswordComponent },
   { path: 'groups', component: BrowseGroupsComponent },
   { path: 'groups/:id', component: GroupDetailsComponent },
+  { path: 'groups/:id/rooms/:roomId', component: RoomComponent },
+  { path: 'groups/:id/requests', component: GroupRequestsComponent },
+  { path: 'groups/:id/kick-request', component: KickRequestComponent },
+  { path: 'ban-request', component: BanRequestComponent },
+  { path: 'admin', component: CreateGroupRequestsComponent },
+  { path: 'admin/create-requests', component: CreateGroupRequestsComponent },
+  { path: 'admin/delete-requests', component: DeleteGroupRequestsComponent },
+  { path: 'admin/ban-requests', component: BanRequestsComponent },
+  { path: 'admin/logs', component: AdminLogsComponent },
 ];
