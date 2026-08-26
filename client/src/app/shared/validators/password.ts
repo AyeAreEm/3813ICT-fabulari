@@ -8,7 +8,6 @@ export function passwordStrength(control: AbstractControl): ValidationErrors | n
 }
 
 export function passwordsMatch(passwordKey: string, confirmKey: string) {
-  console.log("matching", passwordKey, confirmKey);
   return (group: AbstractControl): ValidationErrors | null => {
     const password = group.get(passwordKey)?.value;
     const confirm = group.get(confirmKey)?.value;

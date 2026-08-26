@@ -73,3 +73,21 @@ export interface AuditLogEntry {
   action: string;
   metadata: string;
 }
+
+export interface AuthUser {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  dob?: string;
+  initials: string;
+  isSuperAdmin: boolean;
+}
+
+export interface SignupPayload {
+  firstName: string;
+  lastName: string;
+  dob: string;
+  email: string;
+  password: string;
+}

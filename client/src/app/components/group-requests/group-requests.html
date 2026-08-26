@@ -1,6 +1,6 @@
 <app-shell [groups]="myGroups" [activeGroupId]="group?.id ?? null" *ngIf="group">
   <div class="fab-details-layout">
-    <app-group-nav [groupId]="group.id" [rooms]="rooms" [activeRoomId]="null"></app-group-nav>
+    <app-group-nav [groupId]="group.id" [rooms]="rooms" [activeRoomId]="null" [isGroupAdmin]="isGroupAdmin"></app-group-nav>
 
     <div class="fab-details-main">
       <h1 class="fab-serif fab-details-title">Requests</h1>

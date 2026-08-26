@@ -2,6 +2,7 @@ import { Component, inject, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AuthService } from '../../shared/auth.service';
 
 @Component({
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
@@ -14,13 +15,13 @@ export class ProfileComponent {
   avatarPreview: string | null = null;
 
   private fb = inject(FormBuilder);
+  private auth = inject(AuthService);
 
-  // TODO: prefill via resolver/service with the logged-in user's data
   form = this.fb.group({
-    firstName: ['Jane', Validators.required],
-    lastName: ['Doe', Validators.required],
-    dob: ['1992-04-12', Validators.required],
-    email: [{ value: 'jane.doe@email.com', disabled: true }]
+    firstName: [this.auth.currentUser?.firstName, Validators.required],
+    lastName: [this.auth.currentUser?.lastName, Validators.required],
+    dob: [this.auth.currentUser?.dob, Validators.required],
+    email: [{ value: this.auth.currentUser?.email, disabled: true }]
   });
 
     onAvatarSelected(event: Event) {

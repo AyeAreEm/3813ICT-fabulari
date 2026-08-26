@@ -1,8 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { passwordStrength, passwordsMatch } from '../../shared/validators/password';
+import { AuthService } from '../../shared/auth.service';
 
 @Component({
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
@@ -12,6 +13,7 @@ import { passwordStrength, passwordsMatch } from '../../shared/validators/passwo
 })
 export class SignupComponent {
   private fb = inject(FormBuilder);
+  constructor(private auth: AuthService, private router: Router) {}
 
   showPassword: boolean = false;
   showConfirmPassword: boolean = false;
@@ -40,6 +42,13 @@ export class SignupComponent {
       return;
     }
 
-    console.log('signup', this.form.value);
+    this.auth.signup(this.form.value.firstName, this.form.value.lastName, this.form.value.dob, this.form.value.email, this.form.value.password).subscribe((success) => {
+      if (success) {
+        this.router.navigateByUrl('/groups');
+      } else {
+        this.form.get('email')?.setErrors({signupFailed: true})
+        this.form.get('email')?.setValue('');
+      }
+    });
   }
 }

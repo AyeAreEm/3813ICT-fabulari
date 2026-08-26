@@ -1,7 +1,7 @@
 <aside class="fab-groupnav">
   <div class="fab-sidebar__label">Info</div>
   <a [routerLink]="['/groups', groupId]" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="fab-groupnav__item">Details</a>
-  <a [routerLink]="['/groups', groupId, 'requests']" routerLinkActive="active" class="fab-groupnav__item">Requests</a>
+  <a *ngIf="isGroupAdmin" [routerLink]="['/groups', groupId, 'requests']" routerLinkActive="active" class="fab-groupnav__item">Requests</a>
 
   <div class="fab-sidebar__label mt-4">Rooms</div>
   <a *ngFor="let r of rooms"

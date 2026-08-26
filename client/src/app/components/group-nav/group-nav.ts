@@ -13,4 +13,5 @@ export class GroupNavComponent {
   @Input({ required: true }) groupId!: string;
   @Input() rooms: Room[] = [];
   @Input() activeRoomId: string | null = null;
+  @Input() isGroupAdmin: boolean = false;
 }

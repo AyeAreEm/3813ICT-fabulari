@@ -1,11 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ShellComponent } from '../shell/shell';
 import { GroupNavComponent } from '../group-nav/group-nav';
-import { Group, GroupRequest, Room } from '../../shared/models';
-import { MOCK_ALL_GROUPS, MOCK_GROUP_REQUESTS, MOCK_MY_GROUPS, MOCK_ROOMS } from '../../shared/mock-data';
+import { Group, GroupRequest, Room, Member } from '../../shared/models';
+import { MOCK_ALL_GROUPS, MOCK_GROUP_REQUESTS, MOCK_MY_GROUPS, MOCK_ROOMS, MOCK_MEMBERS } from '../../shared/mock-data';
+import { AuthService } from '../../shared/auth.service';
 
 @Component({
   imports: [CommonModule, ShellComponent, GroupNavComponent],
@@ -18,15 +19,24 @@ export class GroupRequestsComponent implements OnInit, OnDestroy {
   group!: Group;
   rooms: Room[] = MOCK_ROOMS;
   requests: GroupRequest[] = [...MOCK_GROUP_REQUESTS];
+  members: Member[] = MOCK_MEMBERS;
 
   private paramSub?: Subscription;
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(private route: ActivatedRoute, private auth: AuthService, private router: Router) {}
+
+  get isGroupAdmin(): boolean {
+    return this.members.some(m => m.role === 'Admin');
+  }
 
   ngOnInit() {
     this.paramSub = this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       this.group = MOCK_ALL_GROUPS.find(g => g.id === id) ?? MOCK_ALL_GROUPS[0];
+
+      if (!this.isGroupAdmin) {
+        this.router.navigate(['/groups', this.group.id]);
+      }
     });
   }
 

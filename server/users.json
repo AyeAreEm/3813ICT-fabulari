@@ -1,0 +1,18 @@
+[
+  {
+    "firstName": "Super",
+    "lastName": "Admin",
+    "dob": "1977-01-01",
+    "email": "super@admin.com",
+    "password": "Superadmin",
+    "isSuperAdmin": true
+  },
+  {
+    "firstName": "Adrian",
+    "lastName": "Mehta",
+    "dob": "2006-09-08",
+    "email": "adrian.mehta@gmail.com",
+    "password": "asdfasdfA",
+    "isSuperAdmin": false
+  }
+]

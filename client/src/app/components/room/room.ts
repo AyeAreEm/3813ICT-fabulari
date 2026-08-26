@@ -7,6 +7,7 @@ import { ShellComponent } from '../shell/shell';
 import { GroupNavComponent } from '../group-nav/group-nav';
 import { Group, Member, Message, Room } from '../../shared/models';
 import { MOCK_ALL_GROUPS, MOCK_MEMBERS, MOCK_MESSAGES, MOCK_MY_GROUPS, MOCK_ROOMS } from '../../shared/mock-data';
+import { AuthService } from '../../shared/auth.service';
 
 @Component({
   imports: [CommonModule, FormsModule, ShellComponent, GroupNavComponent],
@@ -27,7 +28,13 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   private paramSub?: Subscription;
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(private route: ActivatedRoute, private auth: AuthService) {}
+
+  get isGroupAdmin(): boolean {
+    const userId = this.auth.currentUser?.id;
+    if (!userId) return false;
+    return this.members.some(m => m.id === userId && m.role === 'Admin');
+  }
 
   ngOnInit() {
     this.paramSub = this.route.paramMap.subscribe(params => {

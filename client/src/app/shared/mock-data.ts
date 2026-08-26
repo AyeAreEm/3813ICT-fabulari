@@ -1,4 +1,4 @@
-import { Group, Room, Member, Message, GroupRequest, CreateGroupRequest, DeleteGroupRequest, BanRequest, AuditLogEntry } from './models';
+import { Group, Room, Member, Message, GroupRequest, CreateGroupRequest, DeleteGroupRequest, BanRequest, AuditLogEntry, AuthUser } from './models';
 
 // TODO: replace all of this with real API calls once GroupService/UserService exist
 
@@ -64,3 +64,12 @@ export const MOCK_LOGS: AuditLogEntry[] = [
   { id: 'l5', dateTime: 'Jan 23, 16:05', actor: 'System', action: 'Created room: Blender', metadata: 'Auto-approved under trusted group policy for Creative Designers.' },
   { id: 'l6', dateTime: 'Jan 23, 09:14', actor: 'Super Admin Jane', action: 'Denied group creation: Spam Central', metadata: 'Flagged as duplicate of an existing community.' },
 ];
+
+export const MOCK_CURRENT_USER: AuthUser = {
+  id: 'jane-doe',
+  firstName: 'Jane',
+  lastName: 'Doe',
+  email: 'jane.doe@email.com',
+  initials: 'JD',
+  isSuperAdmin: true
+};

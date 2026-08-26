@@ -1,6 +1,6 @@
 <app-shell [groups]="myGroups" [activeGroupId]="group?.id ?? null" *ngIf="group && activeRoom">
   <div class="fab-room-layout">
-    <app-group-nav [groupId]="group.id" [rooms]="rooms" [activeRoomId]="activeRoom.id"></app-group-nav>
+    <app-group-nav [groupId]="group.id" [rooms]="rooms" [activeRoomId]="activeRoom.id" [isGroupAdmin]="isGroupAdmin"></app-group-nav>
 
     <div class="fab-room-main">
       <div class="fab-room-header">

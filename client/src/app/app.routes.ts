@@ -14,22 +14,24 @@ import { CreateGroupRequestsComponent } from './components/create-group-requests
 import { DeleteGroupRequestsComponent } from './components/delete-group-requests/delete-group-requests';
 import { BanRequestsComponent } from './components/ban-requests/ban-requests';
 import { AdminLogsComponent } from './components/admin-logs/admin-logs';
+import { authGuard } from './shared/auth.guard';
+import { superAdminGuard } from './shared/super-admin.guard';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
   { path: 'signup', component: SignupComponent },
-  { path: 'profile', component: ProfileComponent },
-  { path: 'change-password', component: ChangePasswordComponent },
-  { path: 'groups', component: BrowseGroupsComponent },
-  { path: 'groups/:id', component: GroupDetailsComponent },
-  { path: 'groups/:id/rooms/:roomId', component: RoomComponent },
-  { path: 'groups/:id/requests', component: GroupRequestsComponent },
-  { path: 'groups/:id/kick-request', component: KickRequestComponent },
-  { path: 'ban-request', component: BanRequestComponent },
-  { path: 'admin', component: CreateGroupRequestsComponent },
-  { path: 'admin/create-requests', component: CreateGroupRequestsComponent },
-  { path: 'admin/delete-requests', component: DeleteGroupRequestsComponent },
-  { path: 'admin/ban-requests', component: BanRequestsComponent },
-  { path: 'admin/logs', component: AdminLogsComponent },
+  { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
+  { path: 'change-password', component: ChangePasswordComponent, canActivate: [authGuard] },
+  { path: 'groups', component: BrowseGroupsComponent, canActivate: [authGuard] },
+  { path: 'groups/:id', component: GroupDetailsComponent, canActivate: [authGuard] },
+  { path: 'groups/:id/rooms/:roomId', component: RoomComponent, canActivate: [authGuard] },
+  { path: 'groups/:id/requests', component: GroupRequestsComponent, canActivate: [authGuard] },
+  { path: 'groups/:id/kick-request', component: KickRequestComponent, canActivate: [authGuard] },
+  { path: 'ban-request', component: BanRequestComponent, canActivate: [authGuard] },
+  { path: 'admin', component: CreateGroupRequestsComponent, canActivate: [superAdminGuard] },
+  { path: 'admin/create-requests', component: CreateGroupRequestsComponent, canActivate: [superAdminGuard] },
+  { path: 'admin/delete-requests', component: DeleteGroupRequestsComponent, canActivate: [superAdminGuard] },
+  { path: 'admin/ban-requests', component: BanRequestsComponent, canActivate: [superAdminGuard] },
+  { path: 'admin/logs', component: AdminLogsComponent, canActivate: [superAdminGuard] },
 ];

@@ -8,7 +8,7 @@ import { ModalComponent } from '../modal/modal';
 import { GroupSettingsComponent } from '../group-settings/group-settings';
 import { Group, Member, Room } from '../../shared/models';
 import { MOCK_ALL_GROUPS, MOCK_MEMBERS, MOCK_MY_GROUPS, MOCK_ROOMS } from '../../shared/mock-data';
-
+import { AuthService } from '../../shared/auth.service';
 
 @Component({
   imports: [CommonModule, ShellComponent, GroupNavComponent, ModalComponent, GroupSettingsComponent],
@@ -25,12 +25,12 @@ export class GroupDetailsComponent implements OnInit {
 
   private paramSub?: Subscription;
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(private route: ActivatedRoute, private auth: AuthService) {}
 
   ngOnInit() {
     this.paramSub = this.route.paramMap.subscribe(params => {
       const id = params.get('id');
-      // TODO: replace with GroupService.getGroup(id)
+      // TODO: replace with GroupService.getGroup(id) + GroupService.getMembers(id)
       this.group = MOCK_ALL_GROUPS.find(g => g.id === id) ?? MOCK_ALL_GROUPS[0];
       this.showSettings = false;
     });
@@ -40,10 +40,15 @@ export class GroupDetailsComponent implements OnInit {
     this.paramSub?.unsubscribe();
   }
 
+  get isGroupAdmin(): boolean {
+    return this.members.some(m => m.role === 'Admin');
+  }
+
   openSettings() {
     this.showSettings = true;
   }
 
   closeSettings() {
     this.showSettings = false;
-  }}
+  }
+}
