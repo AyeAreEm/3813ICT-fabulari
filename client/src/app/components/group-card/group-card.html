@@ -1,0 +1,11 @@
+<div class="fab-group-card">
+  <div class="fab-group-card__meta">
+    <span class="fab-badge">{{ group.ageRestriction }}</span>
+    <span class="fab-group-card__count">{{ group.memberCount | number }} members</span>
+  </div>
+  <h3 class="fab-group-card__name fab-serif">{{ group.name }}</h3>
+  <p class="fab-group-card__desc">{{ group.description }}</p>
+  <button type="button" class="btn-fab-dark w-100" (click)="action.emit(group)">
+    {{ group.isMember ? 'View Group' : 'Request to Join' }}
+  </button>
+</div>

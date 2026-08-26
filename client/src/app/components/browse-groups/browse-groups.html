@@ -1,0 +1,23 @@
+<app-shell pageTitle="Browse Groups" userInitials="JD" [groups]="myGroups">
+  <div class="fab-groups-grid">
+    <app-group-card *ngFor="let g of allGroups" [group]="g" (action)="onCardAction(g)"></app-group-card>
+  </div>
+</app-shell>
+
+<app-modal *ngIf="selectedGroup as g" (closed)="closeModal()">
+  <div class="text-center mb-3">
+    <div class="d-flex justify-content-center align-items-center gap-2 mb-2">
+      <span class="fab-badge">{{ g.ageRestriction }}</span>
+      <span class="fab-group-card__count">{{ g.memberCount | number }} members</span>
+    </div>
+    <h2 class="fab-serif fw-bold">{{ g.name }}</h2>
+    <p class="text-muted">{{ g.description }}</p>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Introduce yourself</label>
+    <input class="form-control fab-input" [(ngModel)]="joinMessage" placeholder="Hello! I am…" />
+  </div>
+
+  <button type="button" class="btn-fab-dark w-100" (click)="sendJoinRequest()">Send Join Request</button>
+</app-modal>

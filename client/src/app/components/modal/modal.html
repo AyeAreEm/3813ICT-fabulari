@@ -1,0 +1,5 @@
+<div class="fab-modal-backdrop" (click)="onBackdropClick()">
+  <div class="fab-modal" [style.max-width]="maxWidth" (click)="$event.stopPropagation()">
+    <ng-content></ng-content>
+  </div>
+</div>

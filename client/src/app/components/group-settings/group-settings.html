@@ -1,0 +1,46 @@
+<div>
+  <h2 class="fab-serif fw-bold mb-1">Group Settings</h2>
+  <p class="text-muted mb-4">Customize settings for {{ group.name }}</p>
+
+  <form [formGroup]="form" (ngSubmit)="save()">
+    <div class="mb-3">
+      <label class="form-label">Description</label>
+      <input class="form-control fab-input" formControlName="description" />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label d-block">Background Colour</label>
+      <div class="d-flex gap-2">
+        <button type="button" *ngFor="let c of colours"
+                class="fab-swatch" [style.background]="c"
+                [class.selected]="c === selectedColour"
+                (click)="selectColour(c)" [attr.aria-label]="'Select colour ' + c">
+        </button>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-fab-dark">Save Changes</button>
+  </form>
+
+  <hr class="my-4" />
+
+  <h3 class="fab-danger-title">Danger Zone</h3>
+
+  <div class="mb-3">
+    <label class="form-label">Appoint Successor</label>
+    <div class="d-flex gap-2">
+      <select class="form-select fab-input" [(ngModel)]="successorId" [ngModelOptions]="{ standalone: true }">
+        <option *ngFor="let m of members" [value]="m.id">{{ m.name }}</option>
+      </select>
+      <button type="button" class="btn-fab-dark" (click)="appointSuccessor()">Appoint</button>
+    </div>
+  </div>
+
+  <div class="fab-danger-box d-flex justify-content-between align-items-center">
+    <div>
+      <div class="fab-danger-title mb-1">Delete Group</div>
+      <div class="text-muted small">Permanently remove this group, all rooms, and conversation history.</div>
+    </div>
+    <button type="button" class="btn-fab-danger-outline" (click)="deleteGroup()">Delete</button>
+  </div>
+</div>

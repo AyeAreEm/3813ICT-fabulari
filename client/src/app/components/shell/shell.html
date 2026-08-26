@@ -1,0 +1,25 @@
+<div class="fab-shell">
+  <header class="fab-navbar">
+    <a routerLink="/" class="text-decoration-none">
+      <img width="100" height="50" src="fabulari-logo.png" alt="logo">
+    </a>
+    <a routerLink="/groups" class="text-decoration-none fab-navbar__title">Browse Groups</a>
+    <a routerLink="/profile" class="fab-navbar__avatar">JD</a>
+  </header>
+
+  <div class="fab-shell__body">
+    <aside class="fab-sidebar">
+      <div class="fab-sidebar__label">My Groups</div>
+      <a *ngFor="let g of groups"
+         [routerLink]="['/groups', g.id]"
+         [class.active]="g.id === activeGroupId"
+         class="fab-sidebar__item">
+        <span class="fab-sidebar__icon">{{ g.icon }}</span> {{ g.name }}
+      </a>
+    </aside>
+
+    <main class="fab-shell__main">
+      <ng-content></ng-content>
+    </main>
+  </div>
+</div>
