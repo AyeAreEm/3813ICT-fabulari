@@ -13,10 +13,10 @@ export class AdminService {
     return this.http.get<CreateGroupRequest[]>(`${apiUrl}/create-group-requests`);
   }
   approveCreateRequest(id: string): Observable<void> {
-    return this.http.post<void>(`${apiUrl}/admin/create-requests/${id}/approve`, {});
+    return this.http.patch<void>(`${apiUrl}/create-group-requests/${id}`, {create: true});
   }
   denyCreateRequest(id: string): Observable<void> {
-    return this.http.post<void>(`${apiUrl}/admin/create-requests/${id}/deny`, {});
+    return this.http.patch<void>(`${apiUrl}/create-group-requests/${id}`, {create: false});
   }
 
   getDeleteRequests(): Observable<DeleteGroupRequest[]> {

@@ -42,6 +42,11 @@
     <div class="fab-detail-value text-muted">&ldquo;{{ r.description }}&rdquo;</div>
   </div>
 
+  <div class="fab-detail-block">
+    <div class="fab-detail-label">Minimum Age</div>
+    <div class="fab-detail-value text-muted">{{ r.ageRestriction }}</div>
+  </div>
+
   <div class="d-flex gap-2 mt-4">
     <button type="button" class="btn-fab-dark flex-fill" (click)="approve(r)">Approve Creation</button>
     <button type="button" class="btn-fab-reject flex-fill" (click)="deny(r)">Reject Request</button>

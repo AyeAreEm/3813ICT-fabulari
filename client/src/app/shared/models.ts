@@ -46,6 +46,7 @@ export interface CreateGroupRequest {
   proposedTitle: string;
   description: string;
   date: string;
+  ageRestriction: number;
 }
 
 export interface DeleteGroupRequest {

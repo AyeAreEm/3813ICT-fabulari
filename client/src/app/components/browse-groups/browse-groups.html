@@ -1,4 +1,4 @@
-<app-shell [groups]="myGroups">
+<app-shell [groups]="myGroups()">
   <div class="fab-groups-grid">
     <div class="fab-group-card fab-group-card--create" role="button" (click)="openCreateModal()">
       <div class="fab-create-icon">
@@ -10,7 +10,7 @@
       <button type="button" class="btn-fab-dark w-100">Create A Group</button>
     </div>
 
-    <app-group-card *ngFor="let g of allGroups" [group]="g" (action)="onCardAction(g)"></app-group-card>
+    <app-group-card *ngFor="let g of allGroups()" [group]="g" (action)="onCardAction(g)"></app-group-card>
   </div>
 </app-shell>
 
@@ -46,12 +46,6 @@
       <label class="form-label">Description</label>
       <textarea class="form-control fab-input" rows="3" formControlName="description"
                 placeholder="What is this group about?"></textarea>
-    </div>
-
-    <div class="mb-3">
-      <label class="form-label">Reason for creating</label>
-      <textarea class="form-control fab-input" rows="3" formControlName="reason"
-                placeholder="Why does this community need its own space?"></textarea>
     </div>
 
     <div class="mb-4">

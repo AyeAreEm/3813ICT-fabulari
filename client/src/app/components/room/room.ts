@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -6,8 +6,9 @@ import { Subscription } from 'rxjs';
 import { ShellComponent } from '../shell/shell';
 import { GroupNavComponent } from '../group-nav/group-nav';
 import { Group, Member, Message, Room } from '../../shared/models';
-import { MOCK_ALL_GROUPS, MOCK_MEMBERS, MOCK_MESSAGES, MOCK_MY_GROUPS, MOCK_ROOMS } from '../../shared/mock-data';
+import { MOCK_ROOMS } from '../../shared/mock-data';
 import { AuthService } from '../../shared/auth.service';
+import { GroupService } from '../../shared/group.service';
 
 @Component({
   imports: [CommonModule, FormsModule, ShellComponent, GroupNavComponent],
@@ -18,29 +19,42 @@ import { AuthService } from '../../shared/auth.service';
 export class RoomComponent implements OnInit, OnDestroy {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
-  myGroups: Group[] = MOCK_MY_GROUPS;
-  group!: Group;
+  myGroups = signal<Group[]>([]);
+  group = signal<Group>({} as Group);
   rooms: Room[] = MOCK_ROOMS;
   activeRoom!: Room;
-  members: Member[] = MOCK_MEMBERS;
-  messages: Message[] = MOCK_MESSAGES;
+  members = signal<Member[]>([]);
+  messages: Message[] = [];
   draft = '';
+  currentId = "";
 
   private paramSub?: Subscription;
 
-  constructor(private route: ActivatedRoute, private auth: AuthService) {}
+  constructor(private route: ActivatedRoute, private auth: AuthService, private groupService: GroupService) {}
 
   get isGroupAdmin(): boolean {
-    return this.members.some(m => m.id === this.auth.currentUser?.email && m.role === 'Admin');
+    return this.members().some(m => m.id === this.auth.currentUser?.email && m.role === 'Admin');
   }
 
   ngOnInit() {
+    this.groupService.getMyGroups().subscribe({
+      next: (gs) => {
+        this.myGroups.update(_ => gs)
+      }
+    });
+
     this.paramSub = this.route.paramMap.subscribe(params => {
-      const groupId = params.get('id');
-      const roomId = params.get('roomId');
-      // TODO: replace with GroupService.getGroup(id) + ChatService.getMessages(roomId)
-      this.group = MOCK_ALL_GROUPS.find(g => g.id === groupId) ?? MOCK_ALL_GROUPS[0];
+      this.currentId = params.get('id')!;
+      this.groupService.getGroup(this.currentId).subscribe(g => {
+        this.group.set(g);
+      });
+
+      const roomId = params.get('roomId')!;
       this.activeRoom = this.rooms.find(r => r.id === roomId) ?? this.rooms[0];
+    });
+
+    this.groupService.getMembers(this.currentId).subscribe(ms => {
+      this.members.set(ms);
     });
   }
 

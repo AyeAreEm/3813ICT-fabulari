@@ -1,16 +1,19 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Group, GroupRequest, Member, Room, CreateGroupRequest } from './models';
+import { AuthService } from './auth.service';
 
 const apiUrl = "http://localhost:3000";
 
 @Injectable({ providedIn: 'root' })
 export class GroupService {
+  private auth = inject(AuthService);
+
   constructor(private http: HttpClient) {}
 
   getMyGroups(): Observable<Group[]> {
-    return this.http.get<Group[]>(`${apiUrl}/groups/mine`);
+    return this.http.get<Group[]>(`${apiUrl}/profile/${this.auth.currentUser?.email!}/groups`);
   }
 
   getAllGroups(): Observable<Group[]> {
@@ -30,7 +33,7 @@ export class GroupService {
   }
 
   requestJoin(groupId: string, message: string): Observable<void> {
-    return this.http.post<void>(`${apiUrl}/groups/${groupId}/join-requests`, { message });
+    return this.http.post<void>(`${apiUrl}/groups/${groupId}/join-requests`, { userId: this.auth.currentUser?.email!, message });
   }
 
   requestGroupCreation(request: CreateGroupRequest): Observable<void> {
@@ -50,11 +53,11 @@ export class GroupService {
   }
 
   approveRequest(groupId: string, requestId: string): Observable<void> {
-    return this.http.post<void>(`${apiUrl}/groups/${groupId}/requests/${requestId}/approve`, {});
+    return this.http.patch<void>(`${apiUrl}/groups/${groupId}/requests/${requestId}`, {approve: true});
   }
 
   denyRequest(groupId: string, requestId: string): Observable<void> {
-    return this.http.post<void>(`${apiUrl}/groups/${groupId}/requests/${requestId}/deny`, {});
+    return this.http.patch<void>(`${apiUrl}/groups/${groupId}/requests/${requestId}`, {approve: false});
   }
 
   escalateBan(groupId: string, requestId: string): Observable<void> {

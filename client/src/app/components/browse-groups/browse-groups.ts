@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -6,7 +6,6 @@ import { ShellComponent } from '../shell/shell';
 import { GroupCardComponent } from '../group-card/group-card';
 import { ModalComponent } from '../modal/modal';
 import { Group } from '../../shared/models';
-import { MOCK_ALL_GROUPS, MOCK_MY_GROUPS } from '../../shared/mock-data';
 import { GroupService } from '../../shared/group.service';
 import { AuthService } from '../../shared/auth.service';
 
@@ -16,12 +15,27 @@ import { AuthService } from '../../shared/auth.service';
   styleUrl: './browse-groups.css',
   templateUrl: './browse-groups.html',
 })
-export class BrowseGroupsComponent {
+export class BrowseGroupsComponent implements OnInit {
   private fb = inject(FormBuilder);
   private auth = inject(AuthService);
 
-  myGroups: Group[] = MOCK_MY_GROUPS;
-  allGroups: Group[] = MOCK_ALL_GROUPS;
+  constructor(private router: Router, private groupService: GroupService) {}
+
+  myGroups = signal<Group[]>([]);
+  allGroups = signal<Group[]>([]);
+
+  ngOnInit() {
+    this.groupService.getMyGroups().subscribe({
+      next: (gs) => {
+        this.myGroups.set(gs)
+      }
+    });
+    this.groupService.getAllGroups().subscribe({
+      next: (gs) => {
+        this.allGroups.update(_ => gs)
+      }
+    })
+  }
 
   selectedGroup: Group | null = null;
   joinMessage = '';
@@ -30,11 +44,8 @@ export class BrowseGroupsComponent {
   createForm = this.fb.group({
     title: ['', Validators.required],
     description: ['', Validators.required],
-    reason: ['', Validators.required],
     minAge: [13, [Validators.required, Validators.min(0), Validators.max(99)]]
   });
-
-  constructor(private router: Router, private groupService: GroupService) {}
 
   onCardAction(group: Group) {
     if (group.isMember) {
@@ -50,7 +61,7 @@ export class BrowseGroupsComponent {
   }
 
   sendJoinRequest() {
-    this.groupService.requestJoin(this.selectedGroup?.id!, this.joinMessage);
+    this.groupService.requestJoin(this.selectedGroup?.id!, this.joinMessage).subscribe();
     this.closeModal();
   }
 
@@ -69,12 +80,13 @@ export class BrowseGroupsComponent {
     }
 
     let request = {
-      id: "",
+      id: crypto.randomUUID(),
       requesterName: this.auth.currentUser?.firstName + " " + this.auth.currentUser?.lastName,
-      requesterId: "",
+      requesterId: this.auth.currentUser?.email!,
       proposedTitle: this.createForm.value.title!,
-      description: this.createForm.value.reason!,
+      description: this.createForm.value.description!,
       date: Date.now() + "",
+      ageRestriction: this.createForm.value.minAge!,
     };
     this.groupService.requestGroupCreation(request).subscribe();
     this.createForm.reset({ minAge: 13 });

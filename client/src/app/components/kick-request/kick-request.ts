@@ -1,9 +1,9 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Member } from '../../shared/models';
-import { MOCK_MEMBERS } from '../../shared/mock-data';
+import { GroupService } from '../../shared/group.service';
 
 @Component({
   imports: [CommonModule, ReactiveFormsModule],
@@ -13,9 +13,9 @@ import { MOCK_MEMBERS } from '../../shared/mock-data';
 })
 export class KickRequestComponent implements OnInit {
   private fb = inject(FormBuilder);
-  constructor(private route: ActivatedRoute) {}
+  constructor(private route: ActivatedRoute, private groupService: GroupService) {}
 
-  members: Member[] = MOCK_MEMBERS;
+  members = signal<Member[]>([]);
   groupId = '';
 
   form = this.fb.group({
@@ -25,9 +25,13 @@ export class KickRequestComponent implements OnInit {
 
   ngOnInit() {
     this.groupId = this.route.snapshot.paramMap.get('id') ?? '';
-    if (this.members.length) {
-      this.form.patchValue({ memberId: this.members[0].id });
+    if (this.members().length) {
+      this.form.patchValue({ memberId: this.members()[0].id });
     }
+
+    this.groupService.getMembers(this.groupId).subscribe(ms => {
+      this.members.set(ms);
+    });
   }
 
   submit() {

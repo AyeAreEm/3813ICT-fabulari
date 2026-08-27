@@ -1,13 +1,13 @@
-<app-shell [groups]="myGroups" [activeGroupId]="group?.id ?? null" *ngIf="group">
+<app-shell [groups]="myGroups()" [activeGroupId]="group().id ?? null" *ngIf="group()">
   <div class="fab-details-layout">
-    <app-group-nav [groupId]="group.id" [rooms]="rooms" [activeRoomId]="null" [isGroupAdmin]="isGroupAdmin"></app-group-nav>
+    <app-group-nav [groupId]="group().id" [rooms]="rooms" [activeRoomId]="null" [isGroupAdmin]="isGroupAdmin"></app-group-nav>
 
     <div class="fab-details-main">
       <div class="fab-details-card">
         <div class="d-flex justify-content-between align-items-start">
           <div class="d-flex align-items-center gap-2 mb-2">
-            <span class="fab-badge">{{ group.ageRestriction }}</span>
-            <span class="fab-group-card__count">{{ group.memberCount | number }} members</span>
+            <span class="fab-badge">{{ group().ageRestriction }}</span>
+            <span class="fab-group-card__count">{{ group().memberCount | number }} members</span>
           </div>
           <button *ngIf="isGroupAdmin" type="button" class="fab-icon-btn" (click)="openSettings()" aria-label="Group settings">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -16,12 +16,12 @@
             </svg>
           </button>
         </div>
-        <h1 class="fab-serif fab-details-title">{{ group.name }}</h1>
-        <p class="fab-details-desc">{{ group.description }}</p>
+        <h1 class="fab-serif fab-details-title">{{ group().name }}</h1>
+        <p class="fab-details-desc">{{ group().description }}</p>
       </div>
 
       <h2 class="fab-serif fab-section-title">Group Members</h2>
-      <div class="fab-member-row" *ngFor="let m of members">
+      <div class="fab-member-row" *ngFor="let m of members()">
         <div class="d-flex align-items-center gap-3">
           <span class="fab-avatar-sm">{{ m.initials }}</span>
           <span class="fab-member-name">{{ m.name }}</span>
@@ -33,5 +33,5 @@
 </app-shell>
 
 <app-modal *ngIf="showSettings" (closed)="closeSettings()" maxWidth="560px">
-  <app-group-settings [group]="group" [members]="members" (closed)="closeSettings()"></app-group-settings>
+  <app-group-settings [group]="group()" [members]="members()" (closed)="closeSettings()"></app-group-settings>
 </app-modal>

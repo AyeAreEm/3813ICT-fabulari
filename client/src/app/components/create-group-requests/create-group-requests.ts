@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { AdminShellComponent } from '../admin-shell/admin-shell';
 import { ModalComponent } from '../modal/modal';
 import { CreateGroupRequest } from '../../shared/models';
-import { MOCK_CREATE_REQUESTS } from '../../shared/mock-data';
 import { AdminService } from '../../shared/super-admin.service';
 
 @Component({
@@ -23,7 +22,7 @@ export class CreateGroupRequestsComponent implements OnInit {
   ngOnInit() {
     this.admin.getCreateRequests().subscribe({
       next: (reqs) => {
-        this.requests.update(_ => [...MOCK_CREATE_REQUESTS, ...reqs]);
+        this.requests.update(_ => reqs);
       }
     });
   }
@@ -32,8 +31,8 @@ export class CreateGroupRequestsComponent implements OnInit {
   close() { this.selected = null; }
 
   approve(req: CreateGroupRequest) {
-    console.log('approve create', req);
-    // TODO: AdminService.approveGroupCreation(req.id)
+    console.log("approving");
+    this.admin.approveCreateRequest(req.id).subscribe();
     this.remove(req);
   }
 

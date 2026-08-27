@@ -1,0 +1,23 @@
+[
+  {
+    "id": "0954e58b-d1de-49a1-b0e7-2b193d499817",
+    "admin": "Jane Doe",
+    "adminId": "jane.doe@email.com",
+    "name": "Test",
+    "description": "This is a test",
+    "members": [
+        {
+          "id": "jane.doe@email.com",
+          "name": "Jane Doe",
+          "initials": "JD",
+          "role": "Admin"
+        },
+        {
+          "id": "adrian.mehta@gmail.com",
+          "name": "Adrian Mehta",
+          "initials": "AM",
+          "role": "Member"
+        }
+    ]
+  }
+]

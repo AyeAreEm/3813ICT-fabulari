@@ -7,7 +7,7 @@
       <div class="mb-3">
         <label class="form-label">Select Group Member</label>
         <select class="form-select fab-input" formControlName="memberId">
-          <option *ngFor="let m of members" [value]="m.id">{{ m.name }}</option>
+          <option *ngFor="let m of members()" [value]="m.id">{{ m.name }}</option>
         </select>
       </div>
 

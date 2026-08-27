@@ -1,11 +1,10 @@
-<app-shell [groups]="myGroups" [activeGroupId]="group?.id ?? null" *ngIf="group && activeRoom">
+<app-shell [groups]="myGroups()" [activeGroupId]="group().id ?? null" *ngIf="group() && activeRoom">
   <div class="fab-room-layout">
-    <app-group-nav [groupId]="group.id" [rooms]="rooms" [activeRoomId]="activeRoom.id" [isGroupAdmin]="isGroupAdmin"></app-group-nav>
+    <app-group-nav [groupId]="group().id" [rooms]="rooms" [activeRoomId]="activeRoom.id" [isGroupAdmin]="isGroupAdmin"></app-group-nav>
 
     <div class="fab-room-main">
       <div class="fab-room-header">
         <h2 class="fab-room-title"># {{ activeRoom.name }}</h2>
-        <p class="fab-room-desc">{{ group.name }} general chat and challenge discussions</p>
       </div>
 
       <div class="fab-room-messages">
@@ -38,8 +37,8 @@
     </div>
 
     <aside class="fab-users-panel">
-      <div class="fab-sidebar__label">Users in room ({{ members.length }})</div>
-      <div class="fab-user-row" *ngFor="let m of members">
+      <div class="fab-sidebar__label">Users in room ({{ members().length }})</div>
+      <div class="fab-user-row" *ngFor="let m of members()">
         <div class="fab-user-name">{{ m.name }}</div>
         <div class="fab-user-role">{{ m.role }}</div>
       </div>

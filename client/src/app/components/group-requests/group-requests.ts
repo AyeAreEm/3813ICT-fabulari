@@ -1,12 +1,13 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ShellComponent } from '../shell/shell';
 import { GroupNavComponent } from '../group-nav/group-nav';
 import { Group, GroupRequest, Room, Member } from '../../shared/models';
-import { MOCK_ALL_GROUPS, MOCK_GROUP_REQUESTS, MOCK_MY_GROUPS, MOCK_ROOMS, MOCK_MEMBERS } from '../../shared/mock-data';
+import { MOCK_ROOMS } from '../../shared/mock-data';
 import { AuthService } from '../../shared/auth.service';
+import { GroupService } from '../../shared/group.service';
 
 @Component({
   imports: [CommonModule, ShellComponent, GroupNavComponent],
@@ -15,28 +16,46 @@ import { AuthService } from '../../shared/auth.service';
   templateUrl: './group-requests.html',
 })
 export class GroupRequestsComponent implements OnInit, OnDestroy {
-  myGroups: Group[] = MOCK_MY_GROUPS;
-  group!: Group;
+  myGroups = signal<Group[]>([]);
+  group = signal<Group>({} as Group);
   rooms: Room[] = MOCK_ROOMS;
-  requests: GroupRequest[] = [...MOCK_GROUP_REQUESTS];
-  members: Member[] = MOCK_MEMBERS;
+  requests = signal<GroupRequest[]>([]);
+  members = signal<Member[]>([]);
+  currentId = "";
 
   private paramSub?: Subscription;
 
-  constructor(private route: ActivatedRoute, private auth: AuthService, private router: Router) {}
+  constructor(private route: ActivatedRoute, private auth: AuthService, private router: Router, private groupService: GroupService) {}
 
   get isGroupAdmin(): boolean {
-    return this.members.some(m => m.id === this.auth.currentUser?.email && m.role === 'Admin');
+    return this.members().some(m => m.id === this.auth.currentUser?.email && m.role === 'Admin');
   }
 
   ngOnInit() {
-    this.paramSub = this.route.paramMap.subscribe(params => {
-      const id = params.get('id');
-      this.group = MOCK_ALL_GROUPS.find(g => g.id === id) ?? MOCK_ALL_GROUPS[0];
-
-      if (!this.isGroupAdmin) {
-        this.router.navigate(['/groups', this.group.id]);
+    this.groupService.getMyGroups().subscribe({
+      next: (gs) => {
+        this.myGroups.update(_ => gs)
       }
+    });
+
+    this.paramSub = this.route.paramMap.subscribe(params => {
+      this.currentId = params.get('id')!;
+
+      this.groupService.getGroup(this.currentId).subscribe(g => {
+        this.group.set(g);
+      });
+
+      this.groupService.getMembers(this.currentId).subscribe(ms => {
+        this.members.set(ms);
+
+        if (!this.isGroupAdmin) {
+          this.router.navigate(['/groups', this.group().id]);
+        }
+      });
+
+      this.groupService.getGroupRequests(this.currentId).subscribe(rs => {
+        this.requests.set(rs);
+      });
     });
   }
 
@@ -50,7 +69,7 @@ export class GroupRequestsComponent implements OnInit, OnDestroy {
 
   approve(req: GroupRequest) {
     console.log('approve', req);
-    // TODO: GroupService.approveRequest(req.id)
+    this.groupService.approveRequest(this.currentId, req.id).subscribe();
     this.remove(req);
   }
 
@@ -67,6 +86,6 @@ export class GroupRequestsComponent implements OnInit, OnDestroy {
   }
 
   private remove(req: GroupRequest) {
-    this.requests = this.requests.filter(r => r.id !== req.id);
+    this.requests.set(this.requests().filter(r => r.id !== req.id));
   }
 }

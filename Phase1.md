@@ -317,6 +317,7 @@ All services (except for guards) will be postfixed with "Service" in the codebas
 | -------- | ------ | ----------- |
 | /profile | patch | Update profile information except email |
 | /profile/:id | get | Retrieve a profile |
+| /profile/:id/groups | get | Get all groups a profile is in |
 
 ### Groups
 | Endpoint | Method | Description |
