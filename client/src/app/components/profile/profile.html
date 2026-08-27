@@ -41,7 +41,12 @@
         <input id="email" type="email" class="form-control fab-input" formControlName="email" />
       </div>
 
-      <button type="submit" class="btn-fab-dark w-100">Save changes</button>
+
+      <div class="mb-3">
+        <button type="submit" class="btn-fab-dark w-100">Save changes</button>
+      </div>
+
+      <button type="button" class="btn-fab-danger w-100" (click)="logout()">logout</button>
     </form>
 
     <a routerLink="/change-password" class="fab-link-center">Change password</a>

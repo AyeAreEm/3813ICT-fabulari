@@ -14,5 +14,13 @@
     "email": "adrian.mehta@gmail.com",
     "password": "asdfasdfA",
     "isSuperAdmin": false
+  },
+  {
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "dob": "1977-01-01",
+    "email": "jane.doe@email.com",
+    "password": "asdfasdfA",
+    "isSuperAdmin": false
   }
 ]

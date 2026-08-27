@@ -41,7 +41,7 @@ export class GroupDetailsComponent implements OnInit {
   }
 
   get isGroupAdmin(): boolean {
-    return this.members.some(m => m.role === 'Admin');
+    return this.members.some(m => m.id === this.auth.currentUser?.email && m.role === 'Admin');
   }
 
   openSettings() {

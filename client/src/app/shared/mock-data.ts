@@ -20,7 +20,8 @@ export const MOCK_ROOMS: Room[] = [
 ];
 
 export const MOCK_MEMBERS: Member[] = [
-  { id: 'jane-doe', name: 'Jane Doe', initials: 'JD', role: 'Admin' },
+  { id: 'adrian.mehta@gmail.com', name: 'Adrian Mehta', initials: 'AM', role: 'Member' },
+  { id: 'jane.doe@email.com', name: 'Jane Doe', initials: 'JD', role: 'Admin' },
   { id: 'alex-mercer', name: 'Alex Mercer', initials: 'AM', role: 'Member' },
   { id: 'david-k', name: 'David K.', initials: 'DK', role: 'Member' },
 ];

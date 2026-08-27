@@ -1,6 +1,6 @@
 import { Component, inject, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../shared/auth.service';
 
@@ -16,6 +16,7 @@ export class ProfileComponent {
 
   private fb = inject(FormBuilder);
   private auth = inject(AuthService);
+  private router = inject(Router);
 
   form = this.fb.group({
     firstName: [this.auth.currentUser?.firstName, Validators.required],
@@ -24,7 +25,7 @@ export class ProfileComponent {
     email: [{ value: this.auth.currentUser?.email, disabled: true }]
   });
 
-    onAvatarSelected(event: Event) {
+  onAvatarSelected(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
     const reader = new FileReader();
@@ -39,5 +40,10 @@ export class ProfileComponent {
     }
     console.log('profile save', this.form.getRawValue(), this.avatarPreview);
     // TODO: call UserService.updateProfile(...)
+  }
+
+  logout() {
+    this.auth.logout();
+    this.router.navigateByUrl("/");
   }
 }

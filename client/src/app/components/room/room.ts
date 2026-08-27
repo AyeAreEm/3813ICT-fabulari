@@ -31,9 +31,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   constructor(private route: ActivatedRoute, private auth: AuthService) {}
 
   get isGroupAdmin(): boolean {
-    const userId = this.auth.currentUser?.id;
-    if (!userId) return false;
-    return this.members.some(m => m.id === userId && m.role === 'Admin');
+    return this.members.some(m => m.id === this.auth.currentUser?.email && m.role === 'Admin');
   }
 
   ngOnInit() {
@@ -55,9 +53,9 @@ export class RoomComponent implements OnInit, OnDestroy {
     if (!text) return;
     this.messages.push({
       id: crypto.randomUUID(),
-      authorId: 'me',
-      authorName: 'You',
-      initials: 'JD',
+      authorId: this.auth.currentUser?.email!,
+      authorName: this.auth.currentUser?.firstName + " " + this.auth.currentUser?.lastName,
+      initials: this.auth.currentUser?.initials || this.auth.currentUser?.firstName[0]! + this.auth.currentUser?.lastName[0]!,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       text
     });

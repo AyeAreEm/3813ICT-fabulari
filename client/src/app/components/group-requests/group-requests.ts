@@ -26,7 +26,7 @@ export class GroupRequestsComponent implements OnInit, OnDestroy {
   constructor(private route: ActivatedRoute, private auth: AuthService, private router: Router) {}
 
   get isGroupAdmin(): boolean {
-    return this.members.some(m => m.role === 'Admin');
+    return this.members.some(m => m.id === this.auth.currentUser?.email && m.role === 'Admin');
   }
 
   ngOnInit() {
