@@ -58,12 +58,12 @@ export const MOCK_BAN_REQUESTS: BanRequest[] = [
 ];
 
 export const MOCK_LOGS: AuditLogEntry[] = [
-  { id: 'l1', dateTime: 'Jan 24, 15:45', actor: 'System', action: 'Approved group creation: Creative Designers', metadata: 'Request originally filed by Sophia Martinez. Automatically processed and approved by Super Admin Jane via central moderation dashboard pipeline.' },
-  { id: 'l2', dateTime: 'Jan 24, 14:12', actor: 'Super Admin Jane', action: 'Denied deletion request: Book Club & Coffee', metadata: 'Reason provided was insufficient to justify permanent deletion.' },
+  { id: 'l1', dateTime: 'Jan 24, 15:45', actor: 'System', action: 'Approved group creation: Creative Designers', metadata: 'Request originally filed by Sophia Martinez. Automatically processed and approved by Super Admin via central moderation dashboard pipeline.' },
+  { id: 'l2', dateTime: 'Jan 24, 14:12', actor: 'Super Admin', action: 'Denied deletion request: Book Club & Coffee', metadata: 'Reason provided was insufficient to justify permanent deletion.' },
   { id: 'l3', dateTime: 'Jan 24, 11:30', actor: 'System', action: 'Banned user: SpamBot99', metadata: 'Escalated by Alex Mercer (Channel Mod) for repeated spam violations.' },
-  { id: 'l4', dateTime: 'Jan 23, 19:22', actor: 'Super Admin Jane', action: 'Approved kick request: ToxicPlayer1', metadata: 'Reviewed evidence submitted by group moderators.' },
+  { id: 'l4', dateTime: 'Jan 23, 19:22', actor: 'Super Admin', action: 'Approved kick request: ToxicPlayer1', metadata: 'Reviewed evidence submitted by group moderators.' },
   { id: 'l5', dateTime: 'Jan 23, 16:05', actor: 'System', action: 'Created room: Blender', metadata: 'Auto-approved under trusted group policy for Creative Designers.' },
-  { id: 'l6', dateTime: 'Jan 23, 09:14', actor: 'Super Admin Jane', action: 'Denied group creation: Spam Central', metadata: 'Flagged as duplicate of an existing community.' },
+  { id: 'l6', dateTime: 'Jan 23, 09:14', actor: 'Super Admin', action: 'Denied group creation: Spam Central', metadata: 'Flagged as duplicate of an existing community.' },
 ];
 
 export const MOCK_CURRENT_USER: AuthUser = {
