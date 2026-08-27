@@ -18,6 +18,19 @@ async function saveUsers(users) {
     await writeFile('./users.json', JSON.stringify(users, null, 2), 'utf-8');
 }
 
+async function loadCreateGroupRequests() {
+    try {
+        const data = await readFile('./create-group-requests.json', 'utf-8');
+        return JSON.parse(data);
+    } catch (err) {
+        return [];
+    }
+}
+
+async function saveCreateGroupRequests(requests) {
+    await writeFile('./create-group-requests.json', JSON.stringify(requests, null, 2), 'utf-8');
+}
+
 app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
@@ -52,6 +65,17 @@ app.post('/auth/login', async (req, res) => {
     }
 
     res.status(400).json({status: "Invalid credentials."});
+});
+
+app.post('/create-group-requests', async (req, res) => {
+    let createGroupRequests = await loadCreateGroupRequests();
+    createGroupRequests.push(req.body);
+    await saveCreateGroupRequests(createGroupRequests);
+});
+
+app.get('/create-group-requests', async (req, res) => {
+    let createGroupRequests = await loadCreateGroupRequests();
+    res.json(createGroupRequests);
 });
 
 app.listen(port, async () => {

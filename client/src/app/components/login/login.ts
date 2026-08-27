@@ -37,7 +37,7 @@ export class LoginComponent {
 
     this.auth.login(this.form.value.email, this.form.value.password).subscribe((success) => {
       if (success) {
-        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/groups';
+        const returnUrl = this.auth.currentUser?.isSuperAdmin ? '/admin/create-requests' : '/groups'
         this.router.navigateByUrl(returnUrl);
       } else {
         this.form.get('email')?.setErrors({invalid: true})

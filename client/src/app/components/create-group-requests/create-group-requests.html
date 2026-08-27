@@ -1,12 +1,14 @@
 <app-admin-shell>
   <div class="fab-admin-list-header">
     <h2 class="fab-admin-list-title fab-serif">Create Requests</h2>
-    <span class="fab-admin-list-sub">{{ requests.length }} requests awaiting review</span>
+    <span class="fab-admin-list-sub">{{ requests().length }} requests awaiting review</span>
   </div>
 
-  <div class="fab-admin-card" *ngFor="let r of requests" (click)="view(r)" role="button">
+  <div class="fab-admin-card" *ngFor="let r of requests()" (click)="view(r)" role="button">
     <div>
-      <div class="fab-admin-card__meta">{{ r.requesterName }} &middot; {{ r.date }}</div>
+      <div class="fab-admin-card__meta">
+        {{ r.requesterName }} &middot; {{ !isNaN(+r.date) ? (+r.date | date:'mediumDate') : r.date }}
+      </div>
       <div class="fab-admin-card__title">{{ r.proposedTitle }}</div>
       <p class="fab-admin-card__msg">&ldquo;{{ r.description }}&rdquo;</p>
     </div>
@@ -16,7 +18,7 @@
     </div>
   </div>
 
-  <p *ngIf="!requests.length" class="text-muted">No pending group creation requests.</p>
+  <p *ngIf="!requests().length" class="text-muted">No pending group creation requests.</p>
 </app-admin-shell>
 
 <app-modal *ngIf="selected as r" (closed)="close()" maxWidth="560px">

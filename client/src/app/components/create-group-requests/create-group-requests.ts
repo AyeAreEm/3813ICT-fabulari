@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminShellComponent } from '../admin-shell/admin-shell';
 import { ModalComponent } from '../modal/modal';
 import { CreateGroupRequest } from '../../shared/models';
 import { MOCK_CREATE_REQUESTS } from '../../shared/mock-data';
+import { AdminService } from '../../shared/super-admin.service';
 
 @Component({
   imports: [CommonModule, AdminShellComponent, ModalComponent],
@@ -11,9 +12,21 @@ import { MOCK_CREATE_REQUESTS } from '../../shared/mock-data';
   styleUrl: './create-group-requests.css',
   templateUrl: './create-group-requests.html',
 })
-export class CreateGroupRequestsComponent {
-requests: CreateGroupRequest[] = [...MOCK_CREATE_REQUESTS];
+export class CreateGroupRequestsComponent implements OnInit {
+  protected readonly isNaN = isNaN;
+
+  admin = inject(AdminService);
+
+  requests = signal<CreateGroupRequest[]>([]);
   selected: CreateGroupRequest | null = null;
+
+  ngOnInit() {
+    this.admin.getCreateRequests().subscribe({
+      next: (reqs) => {
+        this.requests.update(_ => [...MOCK_CREATE_REQUESTS, ...reqs]);
+      }
+    });
+  }
 
   view(req: CreateGroupRequest) { this.selected = req; }
   close() { this.selected = null; }
@@ -31,7 +44,7 @@ requests: CreateGroupRequest[] = [...MOCK_CREATE_REQUESTS];
   }
 
   private remove(req: CreateGroupRequest) {
-    this.requests = this.requests.filter(r => r.id !== req.id);
+    this.requests.update(rs => rs.filter(r => r.id !== req.id));
     if (this.selected?.id === req.id) this.close();
   }
 }
