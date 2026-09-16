@@ -24,6 +24,7 @@ export class AuthService {
   login(email: string | null | undefined, password: string | null | undefined): Observable<boolean> {
     return this.http.post<AuthUser>('http://localhost:3000/auth/login', { email, password }).pipe(
       map((res) => {
+        console.log(res);
         localStorage.setItem(this.storageKey, JSON.stringify(res));
         this.userSubject.next(res);
         return true;

@@ -60,8 +60,8 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
 app.post('/auth/signup', async (req, res) => {
-    const { firstname, lastname, dob, email, password } = req.body;
-    const users = await loadusers();
+    const { firstName, lastName, dob, email, password } = req.body;
+    const users = await loadUsers();
 
     for (let user of users) {
         if (user.email === email) {
@@ -70,10 +70,10 @@ app.post('/auth/signup', async (req, res) => {
         }
     }
 
-    const newuser = {firstname, lastname, dob, email, password, issuperadmin: false};
+    const newuser = {firstName, lastName, dob, email, password, isSuperAdmin: false};
     users.push(newuser);
     await saveUsers(users);
-    res.json(newUser);
+    res.json(newuser);
 });
 
 app.post('/auth/login', async (req, res) => {
@@ -83,6 +83,7 @@ app.post('/auth/login', async (req, res) => {
     for (let user of users) {
         if (user.email === email && user.password === password) {
             const { password: pw, ...safeUser } = user;
+            console.log(safeUser);
             res.json(safeUser);
             return;
         }
