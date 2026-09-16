@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { GroupSettings } from './group-settings';
+import { GroupSettingsComponent } from './group-settings';
 
-describe('GroupSettings', () => {
-  let component: GroupSettings;
-  let fixture: ComponentFixture<GroupSettings>;
+describe('GroupSettingsComponent', () => {
+  let component: GroupSettingsComponent;
+  let fixture: ComponentFixture<GroupSettingsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [GroupSettings],
+      imports: [GroupSettingsComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(GroupSettings);
+    fixture = TestBed.createComponent(GroupSettingsComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

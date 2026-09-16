@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { GroupDetails } from './group-details';
+import { GroupDetailsComponent } from './group-details';
 
-describe('GroupDetails', () => {
-  let component: GroupDetails;
-  let fixture: ComponentFixture<GroupDetails>;
+describe('GroupDetailsComponent', () => {
+  let component: GroupDetailsComponent;
+  let fixture: ComponentFixture<GroupDetailsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [GroupDetails],
+      imports: [GroupDetailsComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(GroupDetails);
+    fixture = TestBed.createComponent(GroupDetailsComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

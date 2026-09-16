@@ -9,7 +9,7 @@ import { Group, Member } from '../../shared/models';
   styleUrl: './group-settings.css',
   templateUrl: './group-settings.html',
 })
-export class GroupSettingsComponent {
+export class GroupSettingsComponent implements OnInit {
   private fb = inject(FormBuilder);
 
   @Input({ required: true }) group!: Group;

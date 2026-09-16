@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BanRequest } from './ban-request';
+import { BanRequestComponent } from './ban-request';
 
-describe('BanRequest', () => {
-  let component: BanRequest;
-  let fixture: ComponentFixture<BanRequest>;
+describe('BanRequestComponent', () => {
+  let component: BanRequestComponent;
+  let fixture: ComponentFixture<BanRequestComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BanRequest],
+      imports: [BanRequestComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(BanRequest);
+    fixture = TestBed.createComponent(BanRequestComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BrowseGroups } from './browse-groups';
+import { BrowseGroupsComponent } from './browse-groups';
 
-describe('BrowseGroups', () => {
-  let component: BrowseGroups;
-  let fixture: ComponentFixture<BrowseGroups>;
+describe('BrowseGroupsComponent', () => {
+  let component: BrowseGroupsComponent;
+  let fixture: ComponentFixture<BrowseGroupsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BrowseGroups],
+      imports: [BrowseGroupsComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(BrowseGroups);
+    fixture = TestBed.createComponent(BrowseGroupsComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

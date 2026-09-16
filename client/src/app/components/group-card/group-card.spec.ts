@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { GroupCard } from './group-card';
+import { GroupCardComponent } from './group-card';
 
-describe('GroupCard', () => {
-  let component: GroupCard;
-  let fixture: ComponentFixture<GroupCard>;
+describe('GroupCardComponent', () => {
+  let component: GroupCardComponent;
+  let fixture: ComponentFixture<GroupCardComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [GroupCard],
+      imports: [GroupCardComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(GroupCard);
+    fixture = TestBed.createComponent(GroupCardComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

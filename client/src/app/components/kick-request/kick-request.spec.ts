@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { KickRequest } from './kick-request';
+import { KickRequestComponent } from './kick-request';
 
-describe('KickRequest', () => {
-  let component: KickRequest;
-  let fixture: ComponentFixture<KickRequest>;
+describe('KickRequestComponent', () => {
+  let component: KickRequestComponent;
+  let fixture: ComponentFixture<KickRequestComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [KickRequest],
+      imports: [KickRequestComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(KickRequest);
+    fixture = TestBed.createComponent(KickRequestComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

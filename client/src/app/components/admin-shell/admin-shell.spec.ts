@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { AdminShell } from './admin-shell';
+import { AdminShellComponent } from './admin-shell';
 
-describe('AdminShell', () => {
-  let component: AdminShell;
-  let fixture: ComponentFixture<AdminShell>;
+describe('AdminShellComponent', () => {
+  let component: AdminShellComponent;
+  let fixture: ComponentFixture<AdminShellComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AdminShell],
+      imports: [AdminShellComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AdminShell);
+    fixture = TestBed.createComponent(AdminShellComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

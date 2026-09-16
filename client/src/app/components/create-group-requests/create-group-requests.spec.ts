@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { CreateGroupRequests } from './create-group-requests';
+import { CreateGroupRequestsComponent } from './create-group-requests';
 
-describe('CreateGroupRequests', () => {
-  let component: CreateGroupRequests;
-  let fixture: ComponentFixture<CreateGroupRequests>;
+describe('CreateGroupRequestsComponent', () => {
+  let component: CreateGroupRequestsComponent;
+  let fixture: ComponentFixture<CreateGroupRequestsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CreateGroupRequests],
+      imports: [CreateGroupRequestsComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(CreateGroupRequests);
+    fixture = TestBed.createComponent(CreateGroupRequestsComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

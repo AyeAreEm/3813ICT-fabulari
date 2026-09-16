@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, ActivatedRoute, Router } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../shared/auth.service';
 
@@ -17,7 +17,6 @@ export class LoginComponent {
   constructor(
     private auth: AuthService,
     private router: Router,
-    private route: ActivatedRoute
   ) {}
 
   form = this.fb.group({

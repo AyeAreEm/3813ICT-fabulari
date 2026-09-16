@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DeleteGroupRequests } from './delete-group-requests';
+import { DeleteGroupRequestsComponent } from './delete-group-requests';
 
-describe('DeleteGroupRequests', () => {
-  let component: DeleteGroupRequests;
-  let fixture: ComponentFixture<DeleteGroupRequests>;
+describe('DeleteGroupRequestsComponent', () => {
+  let component: DeleteGroupRequestsComponent;
+  let fixture: ComponentFixture<DeleteGroupRequestsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DeleteGroupRequests],
+      imports: [DeleteGroupRequestsComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(DeleteGroupRequests);
+    fixture = TestBed.createComponent(DeleteGroupRequestsComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
