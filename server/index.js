@@ -3,6 +3,7 @@ import cors from 'cors';
 import { readFile, writeFile } from 'fs/promises';
 import readline from 'readline/promises';
 import { stdin as input, stdout as output } from 'process';
+import { randomUUID } from 'crypto';
 
 const app = express();
 const port = 3000;
@@ -97,6 +98,7 @@ app.post('/create-group-requests', async (req, res) => {
     let createGroupRequests = await loadCreateGroupRequests();
     createGroupRequests.push(req.body);
     await saveCreateGroupRequests(createGroupRequests);
+    res.status(200).send();
 });
 
 app.get('/create-group-requests', async (req, res) => {
@@ -110,10 +112,11 @@ app.patch('/create-group-requests/:id', async (req, res) => {
     if (req.body.create) {
         let groups = await loadGroups();
         let users = await loadUsers();
-        let user = users.find(u => u.email === r.requesterId);
 
         for (let r of requests) {
-            if (r.id == req.params.id) {
+            let user = users.find(u => u.email === r.requesterId);
+
+            if (r.id === req.params.id) {
                 groups.push({
                     id: crypto.randomUUID(),
                     admin: r.requesterName,
@@ -135,7 +138,7 @@ app.patch('/create-group-requests/:id', async (req, res) => {
     requests = requests.filter(r => r.id !== req.params.id);
     await saveCreateGroupRequests(requests);
 
-    res.status(200);
+    res.status(200).send();
 });
 
 app.get('/groups', async (req, res) => {
@@ -185,7 +188,7 @@ app.post('/groups/:id/join-requests', async (req, res) => {
     });
     await saveGroupRequests(jreqs);
 
-    res.status(200);
+    res.status(200).send();
 });
 
 app.patch('/groups/:gid/requests/:rid', async (req, res) => {
@@ -196,7 +199,7 @@ app.patch('/groups/:gid/requests/:rid', async (req, res) => {
         if (req.body.approve) {
             let groups = await loadGroups();
             let users = await loadUsers();
-            let user = users.find(u => u.email === r.requesterId);
+            let user = users.find(u => u.email === request.userId);
 
             for (let g of groups) {
                 if (g.id === req.params.gid) {
@@ -215,11 +218,13 @@ app.patch('/groups/:gid/requests/:rid', async (req, res) => {
         await saveGroupRequests(requests);
         return;
     }
+
+    // TODO: handle request.type's
 });
 
 app.get('/groups/:id/requests', async (req, res) => {
     let allRequests = await loadGroupRequests();
-    let requests = allRequests.filter(r => r.id !== req.params.id);
+    let requests = allRequests.filter(r => r.groupId === req.params.id);
     let users = await loadUsers();
 
     let sanitized = [];

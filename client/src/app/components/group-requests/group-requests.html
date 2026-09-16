@@ -9,7 +9,7 @@
       <div class="fab-request-card" *ngFor="let r of requests()">
         <div class="d-flex justify-content-between align-items-start mb-2">
           <h3 class="fab-request-title">{{ typeLabel(r.type) }}: {{ r.subjectName }}</h3>
-          <span class="fab-request-date">{{ r.date }}</span>
+          <span class="fab-request-date">{{ r.date | date:'yyyy-MM-dd h:mm a' }}</span>
         </div>
         <p class="fab-request-message">&ldquo;{{ r.message }}&rdquo;</p>
         <div class="d-flex gap-2">
@@ -19,7 +19,7 @@
         </div>
       </div>
 
-      <p *ngIf="!requests.length" class="text-muted">No pending requests right now.</p>
+      <p *ngIf="!requests().length" class="text-muted">No pending requests right now.</p>
     </div>
   </div>
 </app-shell>
