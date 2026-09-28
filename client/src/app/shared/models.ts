@@ -29,8 +29,26 @@ export interface Message {
   text: string;
 }
 
-export type GroupRequestType = 'join' | 'kick' | 'room';
+export interface RoomNotice {
+  id: string;
+  kind: 'joined' | 'left';
+  userId: string;
+  name: string;
+  timestamp: string;
+}
 
+export interface PresenceUser {
+  id: string;
+  name: string;
+  initials: string;
+  role: 'Admin' | 'Member';
+}
+
+export type FeedItem =
+  | { type: 'message'; message: Message }
+  | { type: 'notice'; notice: RoomNotice };
+
+export type GroupRequestType = 'join' | 'kick' | 'room';
 export interface GroupRequest {
   id: string;
   type: GroupRequestType;

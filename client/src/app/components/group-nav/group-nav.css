@@ -1,0 +1,26 @@
+.fab-groupnav__rooms-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.fab-groupnav__add-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--fab-border);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fab-muted);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.fab-groupnav__add-btn:hover {
+  background: #f5f4f1;
+  color: var(--fab-ink);
+}

@@ -1,9 +1,11 @@
 import express from 'express';
 import cors from 'cors';
+import { createServer } from 'http';
 import { readFile, writeFile } from 'fs/promises';
 import readline from 'readline/promises';
 import { stdin as input, stdout as output } from 'process';
 import { randomUUID } from 'crypto';
+import { attachChat } from './chat.js';
 
 const app = express();
 const port = 3000;
@@ -191,6 +193,9 @@ app.post('/groups/:id/join-requests', async (req, res) => {
     res.status(200).send();
 });
 
+app.post('/groups/:id/room-requests', async (req, res) => {
+});
+
 app.patch('/groups/:gid/requests/:rid', async (req, res) => {
     let requests = await loadGroupRequests();
     let request = requests.find(r => r.id === req.params.rid);
@@ -276,7 +281,10 @@ app.get('/profile/:id/groups', async (req, res) => {
     res.json(sanitized);
 });
 
-app.listen(port, async () => {
+const server = createServer(app);
+await attachChat(server, {loadUsers, loadGroups});
+
+server.listen(port, async () => {
     console.log("running on " + port);
 
     const users = await loadUsers();

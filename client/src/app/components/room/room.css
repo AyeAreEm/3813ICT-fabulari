@@ -1,0 +1,20 @@
+.fab-room-status {
+  padding: 0.4rem 2rem;
+  font-size: 0.82rem;
+  color: var(--fab-muted);
+  background: #f5f4f0;
+  border-bottom: 1px solid var(--fab-border);
+}
+
+.fab-room-status--error {
+  color: #9b1c1c;
+  background: #fdf0f0;
+}
+
+/* Inline "X joined / left the room" notices (R15) */
+.fab-room-notice {
+  text-align: center;
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--fab-muted);
+}

@@ -3,9 +3,21 @@
   <a [routerLink]="['/groups', groupId]" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="fab-groupnav__item">Details</a>
   <a *ngIf="isGroupAdmin" [routerLink]="['/groups', groupId, 'requests']" routerLinkActive="active" class="fab-groupnav__item">Requests</a>
 
-  <div class="fab-sidebar__label mt-4">Rooms</div>
+  <div class="fab-groupnav__rooms-header mt-4">
+    <div class="fab-sidebar__label mb-0">Rooms</div>
+    <button type="button" class="fab-groupnav__add-btn" (click)="openCreateRoom()" aria-label="Request a new room">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+    </button>
+  </div>
+
   <a *ngFor="let r of rooms"
      [routerLink]="['/groups', groupId, 'rooms', r.id]"
      [class.active]="r.id === activeRoomId"
      class="fab-groupnav__item"># {{ r.name }}</a>
 </aside>
+
+<app-modal *ngIf="showCreateRoom" (closed)="closeCreateRoom()">
+  <app-create-room-request [groupId]="groupId" (closed)="closeCreateRoom()"></app-create-room-request>
+</app-modal>

@@ -1,0 +1,19 @@
+<div>
+  <h2 class="fab-serif fw-bold mb-1">Request A New Room</h2>
+  <p class="text-muted mb-4">Propose a new room for this group. A Group Admin will review your request.</p>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="mb-3">
+      <label class="form-label">Room Name</label>
+      <input class="form-control fab-input" formControlName="name" placeholder="e.g. general-chat" />
+    </div>
+
+    <div class="mb-4">
+      <label class="form-label">Reason</label>
+      <textarea class="form-control fab-input" rows="4" formControlName="reason"
+                placeholder="Why does this group need this room?"></textarea>
+    </div>
+
+    <button type="submit" class="btn-fab-dark w-100">Submit Request</button>
+  </form>
+</div>

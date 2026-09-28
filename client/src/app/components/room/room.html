@@ -7,17 +7,27 @@
         <h2 class="fab-room-title"># {{ activeRoom.name }}</h2>
       </div>
 
-      <div class="fab-room-messages">
-        <div class="fab-message" *ngFor="let m of messages">
-          <span class="fab-avatar-sm">{{ m.initials }}</span>
-          <div>
-            <div class="fab-message__meta">
-              <span class="fab-message__author">{{ m.authorName }}</span>
-              <span class="fab-message__time">{{ m.timestamp }}</span>
+      <div class="fab-room-status" *ngIf="!chat.connected()">Connecting to chat…</div>
+      <div class="fab-room-status fab-room-status--error" *ngIf="chatError() as err">{{ err }}</div>
+
+      <div class="fab-room-messages" #messagesEl (scroll)="onScroll()">
+        <ng-container *ngFor="let item of feed(); trackBy: trackFeedItem">
+          <div class="fab-message" *ngIf="item.type === 'message'">
+            <span class="fab-avatar-sm">{{ item.message.initials }}</span>
+            <div>
+              <div class="fab-message__meta">
+                <span class="fab-message__author">{{ item.message.authorName }}</span>
+                <span class="fab-message__time">{{ item.message.timestamp | date: 'shortTime' }}</span>
+              </div>
+              <p class="fab-message__text">{{ item.message.text }}</p>
             </div>
-            <p class="fab-message__text">{{ m.text }}</p>
           </div>
-        </div>
+
+          <div class="fab-room-notice" *ngIf="item.type === 'notice'">
+            {{ item.notice.name }} {{ item.notice.kind === 'joined' ? 'joined' : 'left' }} the room
+            · {{ item.notice.timestamp | date: 'shortTime' }}
+          </div>
+        </ng-container>
       </div>
 
       <div class="fab-room-composer">
