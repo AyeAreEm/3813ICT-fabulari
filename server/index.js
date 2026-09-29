@@ -1,61 +1,32 @@
 import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
-import { readFile, writeFile } from 'fs/promises';
 import readline from 'readline/promises';
 import { stdin as input, stdout as output } from 'process';
-import { randomUUID } from 'crypto';
 import { attachChat } from './chat.js';
+import { connectDB, getDB } from './db.js';
 
 const app = express();
 const port = 3000;
 
-async function loadUsers() {
-    try {
-        const data = await readFile('./users.json', 'utf-8');
-        return JSON.parse(data);
-    } catch (err) {
-        return [];
-    }
+function usersCollection() {
+    return getDB().collection('users');
 }
-async function saveUsers(users) {
-    await writeFile('./users.json', JSON.stringify(users, null, 2), 'utf-8');
+function groupsCollection() {
+    return getDB().collection('groups');
 }
-
-async function loadCreateGroupRequests() {
-    try {
-        const data = await readFile('./create-group-requests.json', 'utf-8');
-        return JSON.parse(data);
-    } catch (err) {
-        return [];
-    }
+function groupRequestsCollection() {
+    return getDB().collection('groupRequests');
 }
-async function saveCreateGroupRequests(requests) {
-    await writeFile('./create-group-requests.json', JSON.stringify(requests, null, 2), 'utf-8');
+function createGroupRequestsCollection() {
+    return getDB().collection('createGroupRequests');
 }
 
-async function loadGroups() {
-    try {
-        const data = await readFile('./groups.json', 'utf-8');
-        return JSON.parse(data);
-    } catch (err) {
-        return [];
-    }
+async function findUserByEmail(email) {
+    return usersCollection().findOne({ email }, { projection: { _id: 0 } });
 }
-async function saveGroups(groups) {
-    await writeFile('./groups.json', JSON.stringify(groups, null, 2), 'utf-8');
-}
-
-async function loadGroupRequests() {
-    try {
-        const data = await readFile('./group-requests.json', 'utf-8');
-        return JSON.parse(data);
-    } catch (err) {
-        return [];
-    }
-}
-async function saveGroupRequests(requests) {
-    await writeFile('./group-requests.json', JSON.stringify(requests, null, 2), 'utf-8');
+async function findGroupById(id) {
+    return groupsCollection().findOne({ id }, { projection: { _id: 0 } });
 }
 
 app.use(express.json());
@@ -64,87 +35,69 @@ app.use(express.urlencoded({ extended: true }));
 
 app.post('/auth/signup', async (req, res) => {
     const { firstName, lastName, dob, email, password } = req.body;
-    const users = await loadUsers();
 
-    for (let user of users) {
-        if (user.email === email) {
-            res.status(400).json({status: "email already in use."});
-            return;
-        }
+    const existing = await findUserByEmail(email);
+    if (existing) {
+        res.status(400).json({status: "email already in use."});
+        return;
     }
 
     const newuser = {firstName, lastName, dob, email, password, isSuperAdmin: false};
-    users.push(newuser);
-    await saveUsers(users);
+    await usersCollection().insertOne({ ...newuser });
     res.json(newuser);
 });
 
 app.post('/auth/login', async (req, res) => {
     const { email, password } = req.body;
-    const users = await loadUsers();
 
-    for (let user of users) {
-        if (user.email === email && user.password === password) {
-            const { password: pw, ...safeUser } = user;
-            console.log(safeUser);
-            res.json(safeUser);
-            return;
-        }
+    const user = await usersCollection().findOne({ email, password }, { projection: { _id: 0 } });
+    if (!user) {
+        res.status(400).json({status: "Invalid credentials."});
+        return;
     }
 
-    res.status(400).json({status: "Invalid credentials."});
+    const { password: pw, ...safeUser } = user;
+    res.json(safeUser);
 });
 
 app.post('/create-group-requests', async (req, res) => {
-    console.log(req.body);
-    let createGroupRequests = await loadCreateGroupRequests();
-    createGroupRequests.push(req.body);
-    await saveCreateGroupRequests(createGroupRequests);
+    await createGroupRequestsCollection().insertOne({ ...req.body });
     res.status(200).send();
 });
 
 app.get('/create-group-requests', async (req, res) => {
-    let createGroupRequests = await loadCreateGroupRequests();
+    let createGroupRequests = await createGroupRequestsCollection().find({}, { projection: { _id: 0 } }).toArray();
     res.json(createGroupRequests);
 });
 
 app.patch('/create-group-requests/:id', async (req, res) => {
-    let requests = await loadCreateGroupRequests();
+    let request = await createGroupRequestsCollection().findOne({ id: req.params.id }, { projection: { _id: 0 } });
 
-    if (req.body.create) {
-        let groups = await loadGroups();
-        let users = await loadUsers();
+    if (request && req.body.create) {
+        let user = await findUserByEmail(request.requesterId);
 
-        for (let r of requests) {
-            let user = users.find(u => u.email === r.requesterId);
-
-            if (r.id === req.params.id) {
-                groups.push({
-                    id: crypto.randomUUID(),
-                    admin: r.requesterName,
-                    adminId: r.requesterId,
-                    name: r.proposedTitle,
-                    description: r.description,
-                    members: [{
-                        id: r.requesterId,
-                        name: user.firstName + " " + user.lastName,
-                        initials: user.firstName[0] + user.lastName[0],
-                        role: 'Admin',
-                    }],
-                });
-            }
-        }
-        await saveGroups(groups);
+        await groupsCollection().insertOne({
+            id: crypto.randomUUID(),
+            admin: request.requesterName,
+            adminId: request.requesterId,
+            name: request.proposedTitle,
+            description: request.description,
+            members: [{
+                id: request.requesterId,
+                name: user.firstName + " " + user.lastName,
+                initials: user.firstName[0] + user.lastName[0],
+                role: 'Admin',
+            }],
+        });
     }
 
-    requests = requests.filter(r => r.id !== req.params.id);
-    await saveCreateGroupRequests(requests);
+    await createGroupRequestsCollection().deleteOne({ id: req.params.id });
 
     res.status(200).send();
 });
 
 app.get('/groups', async (req, res) => {
-    let groups = await loadGroups();
+    let groups = await groupsCollection().find({}, { projection: { _id: 0 } }).toArray();
 
     let sanitized = [];
     for (let g of groups) {
@@ -163,8 +116,7 @@ app.get('/groups', async (req, res) => {
 });
 
 app.get('/groups/:id', async (req, res) => {
-    let groups = await loadGroups();
-    let g = groups.find(group => group.id === req.params.id);
+    let g = await findGroupById(req.params.id);
     let sanitized = {
         id: g.id,
         name: g.name,
@@ -179,8 +131,7 @@ app.get('/groups/:id', async (req, res) => {
 });
 
 app.post('/groups/:id/join-requests', async (req, res) => {
-    let jreqs = await loadGroupRequests();
-    jreqs.push({
+    await groupRequestsCollection().insertOne({
         id: crypto.randomUUID(),
         type: 'join',
         groupId: req.params.id,
@@ -188,49 +139,68 @@ app.post('/groups/:id/join-requests', async (req, res) => {
         message: req.body.message,
         date: Date.now(),
     });
-    await saveGroupRequests(jreqs);
 
     res.status(200).send();
 });
 
 app.post('/groups/:id/room-requests', async (req, res) => {
+    await groupRequestsCollection().insertOne({
+        id: crypto.randomUUID(),
+        type: 'room',
+        groupId: req.params.id,
+        userId: req.body.userId,
+        roomName: req.body.name,
+        message: req.body.reason,
+        date: Date.now(),
+    });
+
+    res.status(200).send();
 });
 
 app.patch('/groups/:gid/requests/:rid', async (req, res) => {
-    let requests = await loadGroupRequests();
-    let request = requests.find(r => r.id === req.params.rid);
+    let request = await groupRequestsCollection().findOne({ id: req.params.rid }, { projection: { _id: 0 } });
 
-    if (request.type === 'join') {
-        if (req.body.approve) {
-            let groups = await loadGroups();
-            let users = await loadUsers();
-            let user = users.find(u => u.email === request.userId);
-
-            for (let g of groups) {
-                if (g.id === req.params.gid) {
-                    g.members.push({
-                        id: request.userId,
-                        name: user.firstName + " " + user.lastName,
-                        initials: user.firstName[0] + user.lastName[0],
-                        role: 'Member',
-                    });
-                }
-            }
-            await saveGroups(groups);
-        }
-
-        requests = requests.filter(r => r.id !== req.params.rid);
-        await saveGroupRequests(requests);
+    if (!request) {
+        res.status(404).json({status: "Request not found."});
         return;
     }
 
-    // TODO: handle request.type's
+    if (request.type === 'join') {
+        if (req.body.approve) {
+            let user = await findUserByEmail(request.userId);
+
+            await groupsCollection().updateOne(
+                { id: req.params.gid },
+                { $push: { members: {
+                    id: request.userId,
+                    name: user.firstName + " " + user.lastName,
+                    initials: user.firstName[0] + user.lastName[0],
+                    role: 'Member',
+                } } },
+            );
+        }
+    } else if (request.type === 'room') {
+        if (req.body.approve) {
+            await groupsCollection().updateOne(
+                { id: req.params.gid },
+                { $push: { rooms: {
+                    id: crypto.randomUUID(),
+                    name: request.roomName,
+                } } },
+            );
+        }
+    }
+
+    // TODO: handle 'kick' request type
+
+    await groupRequestsCollection().deleteOne({ id: req.params.rid });
+
+    res.status(200).send();
 });
 
 app.get('/groups/:id/requests', async (req, res) => {
-    let allRequests = await loadGroupRequests();
-    let requests = allRequests.filter(r => r.groupId === req.params.id);
-    let users = await loadUsers();
+    let requests = await groupRequestsCollection().find({ groupId: req.params.id }, { projection: { _id: 0 } }).toArray();
+    let users = await usersCollection().find({}, { projection: { _id: 0 } }).toArray();
 
     let sanitized = [];
     for (let r of requests) {
@@ -239,7 +209,7 @@ app.get('/groups/:id/requests', async (req, res) => {
         sanitized.push({
             id: r.id,
             type: r.type,
-            subjectName: user.firstName + " " + user.lastName,
+            subjectName: r.type === 'room' ? r.roomName : (user ? user.firstName + " " + user.lastName : 'Unknown'),
             message: r.message,
             date: r.date,
         });
@@ -248,22 +218,18 @@ app.get('/groups/:id/requests', async (req, res) => {
     res.json(sanitized);
 });
 
+app.get('/groups/:id/rooms', async (req, res) => {
+    let group = await groupsCollection().findOne({ id: req.params.id }, { projection: { _id: 0, rooms: 1 } });
+    res.json(group?.rooms ?? []);
+});
+
 app.get('/groups/:id/members', async (req, res) => {
-    let groups = await loadGroups();
-    let group = groups.find(g => g.id === req.params.id);
+    let group = await groupsCollection().findOne({ id: req.params.id }, { projection: { _id: 0, members: 1 } });
     res.json(group.members);
 });
 
 app.get('/profile/:id/groups', async (req, res) => {
-    let groups = await loadGroups();
-    let theirs = groups.filter(g => {
-        for (let member of g.members) {
-            if (member.id === req.params.id)  {
-                return true;
-            }
-        }
-        return false;
-    });
+    let theirs = await groupsCollection().find({ 'members.id': req.params.id }, { projection: { _id: 0 } }).toArray();
 
     let sanitized = [];
     for (let g of theirs) {
@@ -282,13 +248,21 @@ app.get('/profile/:id/groups', async (req, res) => {
 });
 
 const server = createServer(app);
-await attachChat(server, {loadUsers, loadGroups});
+
+try {
+    await connectDB();
+} catch (err) {
+    console.error('Could not connect to MongoDB:', err.message);
+    console.error(`Make sure MongoDB is running and reachable (checked ${process.env.MONGODB_URI ?? 'mongodb://127.0.0.1:27017'}).`);
+    process.exit(1);
+}
+
+await attachChat(server, { findUserByEmail, findGroupById });
 
 server.listen(port, async () => {
     console.log("running on " + port);
 
-    const users = await loadUsers();
-    const adminExists = users.some(u => u.isSuperAdmin);
+    const adminExists = (await usersCollection().findOne({ isSuperAdmin: true })) !== null;
 
     if (!adminExists) {
         const rl = readline.createInterface({input, output});
@@ -301,8 +275,7 @@ server.listen(port, async () => {
             const email = await rl.question("Email: ");
             const password = await rl.question("Password: ");
 
-            users.push({firstName, lastName, dob, email, password, isSuperAdmin: true});
-            await saveUsers(users);
+            await usersCollection().insertOne({firstName, lastName, dob, email, password, isSuperAdmin: true});
             console.log("Super Admin created.");
         } finally {
             rl.close();

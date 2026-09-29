@@ -5,7 +5,6 @@ import { Subscription } from 'rxjs';
 import { ShellComponent } from '../shell/shell';
 import { GroupNavComponent } from '../group-nav/group-nav';
 import { Group, GroupRequest, Room, Member } from '../../shared/models';
-import { MOCK_ROOMS } from '../../shared/mock-data';
 import { AuthService } from '../../shared/auth.service';
 import { GroupService } from '../../shared/group.service';
 
@@ -18,7 +17,7 @@ import { GroupService } from '../../shared/group.service';
 export class GroupRequestsComponent implements OnInit, OnDestroy {
   myGroups = signal<Group[]>([]);
   group = signal<Group>({} as Group);
-  rooms: Room[] = MOCK_ROOMS;
+  rooms: Room[] = [];
   requests = signal<GroupRequest[]>([]);
   members = signal<Member[]>([]);
   currentId = "";
@@ -45,6 +44,10 @@ export class GroupRequestsComponent implements OnInit, OnDestroy {
         this.group.set(g);
       });
 
+      this.groupService.getRooms(this.currentId).subscribe(rs => {
+        this.rooms = rs;
+      });
+
       this.groupService.getMembers(this.currentId).subscribe(ms => {
         this.members.set(ms);
 
@@ -69,13 +72,19 @@ export class GroupRequestsComponent implements OnInit, OnDestroy {
 
   approve(req: GroupRequest) {
     console.log('approve', req);
-    this.groupService.approveRequest(this.currentId, req.id).subscribe();
+    this.groupService.approveRequest(this.currentId, req.id).subscribe(() => {
+      if (req.type === 'room') {
+        this.groupService.getRooms(this.currentId).subscribe(rs => {
+          this.rooms = rs;
+        });
+      }
+    });
     this.remove(req);
   }
 
   deny(req: GroupRequest) {
     console.log('deny', req);
-    // TODO: GroupService.denyRequest(req.id)
+    this.groupService.denyRequest(this.currentId, req.id).subscribe();
     this.remove(req);
   }
 

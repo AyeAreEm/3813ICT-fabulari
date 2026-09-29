@@ -8,12 +8,6 @@ const socketUrl = 'http://localhost:3000';
 
 type Ack<T = object> = ({ ok: true } & T) | { ok: false; error: string };
 
-/**
- * Owns the single WebSocket connection to the server and exposes it as plain RxJS streams.
- *
- * The socket is created lazily on the first joinRoom() call and lives for the whole
- * logged-in session. A socket is only ever in one room at a time.
- */
 @Injectable({ providedIn: 'root' })
 export class ChatService {
   private auth = inject(AuthService);
@@ -21,7 +15,6 @@ export class ChatService {
   private socket: Socket | null = null;
   private activeRoom: { groupId: string; roomId: string } | null = null;
 
-  /** True while the WebSocket is connected. A signal so templates update under zoneless change detection. */
   readonly connected = signal(false);
 
   private historySubject = new Subject<Message[]>();
@@ -30,19 +23,13 @@ export class ChatService {
   private presenceSubject = new Subject<PresenceUser[]>();
   private errorSubject = new Subject<string>();
 
-  /** Last few messages, delivered each time the room is (re)joined. Replaces whatever is on screen. */
   readonly history$ = this.historySubject.asObservable();
-  /** A new message in the current room (`message:new`). Includes your own messages. */
   readonly message$ = this.messageSubject.asObservable();
-  /** Someone joined or left the current room (`room:userJoined` / `room:userLeft`). */
   readonly notice$ = this.noticeSubject.asObservable();
-  /** Full list of users currently in the room. */
   readonly presence$ = this.presenceSubject.asObservable();
-  /** Human-readable errors worth showing the user. */
   readonly error$ = this.errorSubject.asObservable();
 
   constructor() {
-    // Drop the connection on logout so the next user can't inherit this identity.
     this.auth.user$.subscribe((user) => {
       if (!user) this.disconnect();
     });
@@ -51,7 +38,6 @@ export class ChatService {
   joinRoom(groupId: string, roomId: string) {
     this.activeRoom = { groupId, roomId };
     const socket = this.ensureSocket();
-    // If we're not connected yet, the 'connect' handler joins for us.
     if (socket.connected) this.emitJoin();
   }
 
@@ -62,7 +48,6 @@ export class ChatService {
     this.activeRoom = null;
   }
 
-  /** Completes once the server has accepted the message; errors with the server's reason otherwise. */
   sendMessage(text: string): Observable<void> {
     return new Observable<void>((subscriber) => {
       if (!this.socket?.connected) {
@@ -97,8 +82,6 @@ export class ChatService {
 
     socket.on('connect', () => {
       this.connected.set(true);
-      // Runs on the first connect *and* every automatic reconnect. The server forgets which
-      // room a dropped socket was in, so we always re-join.
       this.emitJoin();
     });
 
@@ -109,8 +92,6 @@ export class ChatService {
       if (err.message === 'unauthorized') {
         this.errorSubject.next('Chat could not verify your account. Please log in again.');
       }
-      // The server refused us outright, so Socket.IO won't retry. Forget the dead socket
-      // so the next joinRoom() starts fresh.
       if (!socket.active && this.socket === socket) this.socket = null;
     });
 
@@ -127,7 +108,7 @@ export class ChatService {
     if (!room || !this.socket) return;
 
     this.socket.emit('room:join', room, (res: Ack<{ history: Message[]; users: PresenceUser[] }>) => {
-      if (this.activeRoom !== room) return; // user has already moved on to another room
+      if (this.activeRoom !== room) return;
       if (res.ok) {
         this.historySubject.next(res.history);
         this.presenceSubject.next(res.users);

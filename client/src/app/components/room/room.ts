@@ -6,12 +6,11 @@ import { Subscription } from 'rxjs';
 import { ShellComponent } from '../shell/shell';
 import { GroupNavComponent } from '../group-nav/group-nav';
 import { FeedItem, Group, Member, PresenceUser, Room } from '../../shared/models';
-import { MOCK_ROOMS } from '../../shared/mock-data';
 import { AuthService } from '../../shared/auth.service';
 import { GroupService } from '../../shared/group.service';
 import { ChatService } from '../../shared/chat.service';
 
-// Keep the DOM small in long-running sessions.
+// keep the DOM small in long-running sessions.
 const MAX_FEED_ITEMS = 200;
 
 @Component({
@@ -26,12 +25,10 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   myGroups = signal<Group[]>([]);
   group = signal<Group>({} as Group);
-  rooms: Room[] = MOCK_ROOMS;
-  activeRoom!: Room;
+  rooms = signal<Room[]>([]);
+  activeRoom = signal<Room>({} as Room);
   members = signal<Member[]>([]);
 
-  // These are signals (not plain fields) because they're updated from WebSocket callbacks,
-  // which don't trigger change detection in a zoneless app.
   feed = signal<FeedItem[]>([]);
   present = signal<PresenceUser[]>([]);
   chatError = signal<string | null>(null);
@@ -50,7 +47,6 @@ export class RoomComponent implements OnInit, OnDestroy {
     readonly chat: ChatService,
     private cdr: ChangeDetectorRef,
   ) {
-    // After each feed update, keep the newest message in view (unless the user scrolled up to read).
     effect(() => {
       this.feed();
       setTimeout(() => this.scrollToBottom());
@@ -72,6 +68,7 @@ export class RoomComponent implements OnInit, OnDestroy {
       this.chatError.set(null);
       this.feed.set(history.map(message => ({ type: 'message', message })));
     }));
+
     this.chatSubs.add(this.chat.message$.subscribe(message => this.append({ type: 'message', message })));
     this.chatSubs.add(this.chat.notice$.subscribe(notice => this.append({ type: 'notice', notice })));
     this.chatSubs.add(this.chat.presence$.subscribe(users => this.present.set(users)));
@@ -84,14 +81,18 @@ export class RoomComponent implements OnInit, OnDestroy {
       });
 
       const roomId = params.get('roomId')!;
-      this.activeRoom = this.rooms.find(r => r.id === roomId) ?? this.rooms[0];
 
-      // Switching room/group reuses this component, so reset the view and join the new room.
-      this.feed.set([]);
-      this.present.set([]);
-      this.chatError.set(null);
-      this.pinnedToBottom = true;
-      this.chat.joinRoom(this.currentId, this.activeRoom.id);
+      this.groupService.getRooms(this.currentId).subscribe(rs => {
+        this.rooms.set(rs);
+        this.activeRoom.set(this.rooms().find(r => r.id === roomId) ?? this.rooms()[0]);
+        if (!this.activeRoom) return;
+
+        this.feed.set([]);
+        this.present.set([]);
+        this.chatError.set(null);
+        this.pinnedToBottom = true;
+        this.chat.joinRoom(this.currentId, this.activeRoom().id);
+      });
     });
 
     this.groupService.getMembers(this.currentId).subscribe(ms => {
@@ -113,12 +114,10 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.chatError.set(null);
     this.pinnedToBottom = true;
 
-    // The message is not added locally: the server broadcasts it back to everyone in the
-    // room (including us), so all clients show the same ordered stream.
     this.chat.sendMessage(text).subscribe({
       error: (err: Error) => {
         this.chatError.set(err.message);
-        this.draft = text; // give the text back so nothing is lost
+        this.draft = text;
         this.cdr.markForCheck();
       },
     });

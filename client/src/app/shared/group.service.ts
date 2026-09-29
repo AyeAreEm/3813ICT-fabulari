@@ -45,7 +45,7 @@ export class GroupService {
   }
 
   requestRoom(groupId: string, name: string, reason: string): Observable<void> {
-    return this.http.post<void>(`${apiUrl}/groups/${groupId}/room-requests`, { name, reason });
+    return this.http.post<void>(`${apiUrl}/groups/${groupId}/room-requests`, { userId: this.auth.currentUser?.email!, name, reason });
   }
 
   getGroupRequests(groupId: string): Observable<GroupRequest[]> {

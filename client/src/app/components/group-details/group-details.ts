@@ -7,7 +7,6 @@ import { GroupNavComponent } from '../group-nav/group-nav';
 import { ModalComponent } from '../modal/modal';
 import { GroupSettingsComponent } from '../group-settings/group-settings';
 import { Group, Member, Room } from '../../shared/models';
-import { MOCK_ROOMS } from '../../shared/mock-data';
 import { AuthService } from '../../shared/auth.service';
 import { GroupService } from '../../shared/group.service';
 
@@ -20,7 +19,7 @@ import { GroupService } from '../../shared/group.service';
 export class GroupDetailsComponent implements OnInit, OnDestroy {
   myGroups = signal<Group[]>([]);
   group = signal<Group>({} as Group);
-  rooms: Room[] = MOCK_ROOMS;
+  rooms: Room[] = [];
   members = signal<Member[]>([]);
   showSettings = false;
 
@@ -39,6 +38,10 @@ export class GroupDetailsComponent implements OnInit, OnDestroy {
       const id = params.get('id')!;
       this.groupService.getGroup(id).subscribe(g => {
         this.group.set(g);
+      });
+
+      this.groupService.getRooms(id).subscribe(rs => {
+        this.rooms = rs;
       });
 
       this.groupService.getMembers(id).subscribe(ms => {

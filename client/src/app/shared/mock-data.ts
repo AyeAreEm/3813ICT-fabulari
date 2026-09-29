@@ -3,7 +3,7 @@ import { Group, Room, Member, Message, GroupRequest, CreateGroupRequest, DeleteG
 // TODO: replace all of this with real API calls once GroupService/UserService exist
 
 export const MOCK_ROOMS: Room[] = [
-  { id: 'general', name: 'General' },
+  // { id: 'general', name: 'General' },
 ];
 
 export const MOCK_GROUP_REQUESTS: GroupRequest[] = [
