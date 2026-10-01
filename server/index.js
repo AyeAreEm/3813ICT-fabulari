@@ -539,13 +539,11 @@ server.listen(port, async () => {
         console.log("Super Admin not detected... Creating one.");
 
         try {
-            const firstName = await rl.question("First Name: ");
-            const lastName = await rl.question("Last Name: ");
             const dob = await rl.question("DOB (YYYY-MM-DD): ");
             const email = await rl.question("Email: ");
             const password = await rl.question("Password: ");
 
-            await usersCollection().insertOne({firstName, lastName, dob, email, password, isSuperAdmin: true});
+            await usersCollection().insertOne({firstName: "Super", lastName: "Admin", dob, email, password, isSuperAdmin: true});
             console.log("Super Admin created.");
         } finally {
             rl.close();
