@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { ModalComponent } from '../modal/modal';
 import { BanRequestComponent } from '../ban-request/ban-request';
 import { ShellComponent } from '../shell/shell';
 import { GroupNavComponent } from '../group-nav/group-nav';
@@ -11,7 +10,7 @@ import { AuthService } from '../../shared/auth.service';
 import { GroupService } from '../../shared/group.service';
 
 @Component({
-  imports: [CommonModule, ShellComponent, GroupNavComponent, ModalComponent, BanRequestComponent],
+  imports: [CommonModule, ShellComponent, GroupNavComponent, BanRequestComponent],
   selector: 'app-group-requests',
   styleUrl: './group-requests.css',
   templateUrl: './group-requests.html',
@@ -23,7 +22,6 @@ export class GroupRequestsComponent implements OnInit, OnDestroy {
   requests = signal<GroupRequest[]>([]);
   members = signal<Member[]>([]);
   currentId = "";
-  banTarget = signal<GroupRequest | null>(null);
 
   private paramSub?: Subscription;
 
@@ -95,16 +93,14 @@ export class GroupRequestsComponent implements OnInit, OnDestroy {
   }
 
   ban(req: GroupRequest) {
-    this.banTarget.set(req);
-  }
-
-  closeBan() {
-    this.banTarget.set(null);
-  }
-
-  onBanSubmitted() {
-    const req = this.banTarget();
-    if (req) this.remove(req);
+    this.router.navigate(['/groups', this.currentId, 'ban-request'], {
+      queryParams: {
+        targetId: req.targetId ?? null,
+        targetName: req.subjectName,
+        sourceKickRequestId: req.id,
+        reason: req.message,
+      },
+    });
   }
 
   private remove(req: GroupRequest) {

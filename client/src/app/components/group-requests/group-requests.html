@@ -26,14 +26,3 @@
     </div>
   </div>
 </app-shell>
-
-<app-modal *ngIf="banTarget() as t" (closed)="closeBan()">
-  <app-ban-request
-    [groupId]="currentId"
-    [targetId]="t.targetId ?? null"
-    [targetName]="t.subjectName"
-    [sourceKickRequestId]="t.id"
-    [reason]="t.message"
-    (submitted)="onBanSubmitted()"
-    (closed)="closeBan()"></app-ban-request>
-</app-modal>

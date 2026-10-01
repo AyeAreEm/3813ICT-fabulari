@@ -12,6 +12,8 @@ import { CreateGroupRequestsComponent } from './components/create-group-requests
 import { DeleteGroupRequestsComponent } from './components/delete-group-requests/delete-group-requests';
 import { BanRequestsComponent } from './components/ban-requests/ban-requests';
 import { AdminLogsComponent } from './components/admin-logs/admin-logs';
+import { KickRequestComponent } from './components/kick-request/kick-request';
+import { BanRequestComponent } from './components/ban-request/ban-request';
 import { authGuard } from './shared/auth.guard';
 import { superAdminGuard } from './shared/super-admin.guard';
 import { homeGuard } from './shared/home.guard';
@@ -22,6 +24,8 @@ export const routes: Routes = [
   { path: 'signup', component: SignupComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
   { path: 'change-password', component: ChangePasswordComponent, canActivate: [authGuard] },
+  { path: 'groups/:id/kick-request', component: KickRequestComponent, canActivate: [authGuard] },
+  { path: 'groups/:id/ban-request', component: BanRequestComponent, canActivate: [authGuard] },
   { path: 'groups', component: BrowseGroupsComponent, canActivate: [authGuard] },
   { path: 'groups/:id', component: GroupDetailsComponent, canActivate: [authGuard] },
   { path: 'groups/:id/rooms/:roomId', component: RoomComponent, canActivate: [authGuard] },
