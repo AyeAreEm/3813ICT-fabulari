@@ -67,6 +67,47 @@ export class ChatService {
     });
   }
 
+  sendFile(file: File): Observable<void> {
+    return new Observable<void>((subscriber) => {
+      if (!this.socket?.connected) {
+        subscriber.error(new Error('Not connected to the chat server.'));
+        return;
+      }
+
+      if (file.size > 2 * 1024 * 1024) {
+        subscriber.error(new Error('File bigger than 2MB.'));
+        return;
+      }
+
+      if (file.type != "image/png" && file.type != "image/jpeg" && file.type != "image/gif") {
+        subscriber.error(new Error('File type unsupported.'));
+        return;
+      }
+
+      file.arrayBuffer().then((buffer) => {
+        const payload = {
+          fileName: file.name,
+          fileType: file.type,
+          fileSize: file.size,
+          data: buffer,
+        };
+
+        this.socket?.timeout(15000).emit('file:send', payload, (err: Error | null, res: Ack) => {
+          if (err) {
+            subscriber.error(new Error('The server did not respond during file upload. Please try again.'));
+          } else if (!res.ok) {
+            subscriber.error(new Error(res.error));
+          } else {
+            subscriber.next();
+            subscriber.complete();
+          }
+        });
+      }).catch((err) => {
+        subscriber.error(new Error('Failed to read file contents: ' + err.message));
+      });
+    });
+  }
+
   disconnect() {
     this.socket?.disconnect();
     this.socket = null;

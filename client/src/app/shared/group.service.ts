@@ -70,7 +70,7 @@ export class GroupService {
   }
 
   updateSettings(groupId: string, payload: { description: string; colour: string }): Observable<Group> {
-    return this.http.patch<Group>(`${apiUrl}/groups/${groupId}/settings`, payload);
+    return this.http.patch<Group>(`${apiUrl}/groups/${groupId}/settings`, { payload });
   }
 
   appointSuccessor(groupId: string, memberId: string): Observable<void> {

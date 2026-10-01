@@ -267,7 +267,7 @@ body {
 
 /* Settings modal extras */
 .fab-swatch { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--fab-border); cursor: pointer; }
-.fab-swatch.selected { outline: 2px solid var(--fab-ink); outline-offset: 2px; }
+.fab-swatch.selected { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--fab-ink); }
 .fab-danger-title { color: #c0392b; font-weight: 700; font-size: 1.05rem; }
 .fab-danger-box {
   border: 1px solid #f3c7c2; background: #fdf1ef; border-radius: 12px; padding: 1rem 1.25rem; margin-top: 0.75rem;

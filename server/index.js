@@ -5,6 +5,7 @@ import readline from 'readline/promises';
 import { stdin as input, stdout as output } from 'process';
 import { attachChat } from './chat.js';
 import { connectDB, getDB } from './db.js';
+import { initUploads, serveUpload } from './files.js';
 
 const app = express();
 const port = 3000;
@@ -46,6 +47,8 @@ app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
+app.get('/uploads/:id', serveUpload);
+
 app.post('/auth/signup', async (req, res) => {
     const { firstName, lastName, dob, email, password } = req.body;
 
@@ -54,7 +57,6 @@ app.post('/auth/signup', async (req, res) => {
         res.status(400).json({status: "email already in use."});
         return;
     }
-
 
     const newuser = {firstName, lastName, dob, email, password, isSuperAdmin: false};
     await usersCollection().insertOne({ ...newuser });
@@ -108,6 +110,7 @@ app.patch('/create-group-requests/:id', async (req, res) => {
                 initials: user.firstName[0] + user.lastName[0],
                 role: 'Admin',
             }],
+            colour: "#ffffff",
         });
 
         await log("Super Admin", "Approved Create Group Request: " + request.proposedTitle);
@@ -149,6 +152,7 @@ app.get('/groups/:id', async (req, res) => {
         ageRestriction: 13,
         icon: "",
         isMember: false,
+        colour: g.colour,
     }
 
     res.json(sanitized);
@@ -411,6 +415,18 @@ app.get('/groups/:id/members', async (req, res) => {
     res.json(group.members);
 });
 
+app.patch('/groups/:id/settings', async (req, res) => {
+    let group = await findGroupById(req.params.id);
+    let payload = req.body.payload;
+
+    await groupsCollection().updateOne(
+        { id: req.params.id },
+        { $set: { description: payload.description, colour: payload.colour } }
+    );
+
+    res.status(200).send();
+});
+
 app.get('/profile/:id/groups', async (req, res) => {
     let theirs = await groupsCollection().find({ 'members.id': req.params.id }, { projection: { _id: 0 } }).toArray();
 
@@ -508,6 +524,8 @@ try {
     console.error(`Make sure MongoDB is running and reachable (checked ${process.env.MONGODB_URI ?? 'mongodb://127.0.0.1:27017'}).`);
     process.exit(1);
 }
+
+await initUploads();
 
 await attachChat(server, { findUserByEmail, findGroupById });
 

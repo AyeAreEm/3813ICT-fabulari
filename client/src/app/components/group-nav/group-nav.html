@@ -3,8 +3,8 @@
   <a [routerLink]="['/groups', groupId]" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="fab-groupnav__item">Details</a>
   <a *ngIf="isGroupAdmin" [routerLink]="['/groups', groupId, 'requests']" routerLinkActive="active" class="fab-groupnav__item">Requests</a>
 
-  <button *ngIf="!isGroupAdmin" type="button" class="fab-groupnav__item fab-groupnav__action" (click)="openKick()">Request Kick</button>
-  <button *ngIf="isGroupAdmin" type="button" class="fab-groupnav__item fab-groupnav__action" (click)="openBan()">Request Ban</button>
+  <a *ngIf="!isGroupAdmin" onmouseover="this.style.cursor='pointer'" class="fab-groupnav__item" (click)="openKick()">Request Kick</a>
+  <a *ngIf="isGroupAdmin" onmouseover="this.style.cursor='pointer'" class="fab-groupnav__item" (click)="openBan()">Request Ban</a>
 
   <div class="fab-groupnav__rooms-header mt-4">
     <div class="fab-sidebar__label mb-0">Rooms</div>

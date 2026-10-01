@@ -138,11 +138,31 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   onFileSelected(event: Event) {
-    const file = (event.target as HTMLInputElement).files?.[0];
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
     if (!file) return;
-    console.log('file selected', file.name);
-    // TODO: attach file to the outgoing message once ChatService supports uploads
-    (event.target as HTMLInputElement).value = '';
+
+    this.chatError.set(null);
+    this.pinnedToBottom = true;
+
+    this.chat.sendFile(file).subscribe({
+      error: (err: Error) => {
+        this.chatError.set(err.message);
+        this.cdr.markForCheck();
+      },
+    });
+
+    input.value = '';
+  }
+
+  onImageLoad() {
+    this.scrollToBottom();
+  }
+
+  private readonly serverOrigin = 'http://localhost:3000';
+
+  attachmentUrl(path: string): string {
+    return this.serverOrigin + path;
   }
 
   private append(item: FeedItem) {

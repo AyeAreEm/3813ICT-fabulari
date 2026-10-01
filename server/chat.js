@@ -1,6 +1,7 @@
 import { Server } from 'socket.io';
 import { randomUUID } from 'node:crypto';
 import { getDB } from './db.js';
+import { saveImage, deleteUpload, MAX_FILE_SIZE } from './files.js';
 
 const MAX_HISTORY = 5;
 const MAX_MESSAGE_LENGTH = 2000;
@@ -25,13 +26,14 @@ async function pushMessage(key, message) {
     await collection.insertOne({ room: key, ...message });
 
     const stale = await collection
-        .find({ room: key }, { projection: { _id: 1 } })
+        .find({ room: key }, { projection: { _id: 1, attachment: 1 } })
         .sort({ timestamp: -1 })
         .skip(MAX_HISTORY)
         .toArray();
 
     if (stale.length > 0) {
         await collection.deleteMany({ _id: { $in: stale.map((d) => d._id) } });
+        await Promise.all(stale.filter((d) => d.attachment).map((d) => deleteUpload(d.attachment.url)));
     }
 }
 
@@ -54,6 +56,7 @@ function userHasOtherSocketInRoom(key, userId, exceptSocketId) {
 export async function attachChat(httpServer, { findUserByEmail, findGroupById }) {
     const io = new Server(httpServer, {
         cors: { origin: process.env.CLIENT_ORIGIN ?? 'http://localhost:4200' },
+        maxHttpBufferSize: 3 * 1024 * 1024,   // default is 1MB, which would drop the socket on larger uploads
     });
 
     io.use(async (socket, next) => {
@@ -167,6 +170,65 @@ export async function attachChat(httpServer, { findUserByEmail, findGroupById })
             } catch (err) {
                 console.error('failed to save message:', err);
                 return reply({ ok: false, error: 'Could not send message.' });
+            }
+
+            io.to(room.key).emit('message:new', message);
+            reply({ ok: true });
+        });
+
+        let lastUpload = 0;
+
+        socket.on('file:send', async (payload, ack) => {
+            const reply = typeof ack === 'function' ? ack : () => {};
+            const room = socket.data.room;
+            if (!room) return reply({ ok: false, error: 'Join a room before sending files.' });
+
+            const now = Date.now();
+            if (now - lastUpload < 1000) return reply({ ok: false, error: 'You are uploading too quickly.' });
+            lastUpload = now;
+
+            let buf;
+            try {
+                if (!payload?.data) return reply({ ok: false, error: 'No file data received.' });
+                buf = Buffer.isBuffer(payload.data) ? payload.data : Buffer.from(payload.data);
+            } catch {
+                return reply({ ok: false, error: 'Invalid file data.' });
+            }
+
+            if (buf.length === 0) return reply({ ok: false, error: 'File is empty.' });
+            if (buf.length > MAX_FILE_SIZE) return reply({ ok: false, error: 'File bigger than 2MB.' });
+
+            let saved;
+            try {
+                saved = await saveImage(buf);
+            } catch (err) {
+                console.error('failed to save file:', err);
+                return reply({ ok: false, error: 'Could not save the file.' });
+            }
+            if (!saved) return reply({ ok: false, error: 'File type unsupported.' });
+
+            const { id: authorId, name: authorName, initials } = socket.data.user;
+            const message = {
+                id: randomUUID(),
+                authorId,
+                authorName,
+                initials,
+                timestamp: new Date().toISOString(),
+                text: '',
+                attachment: {
+                    url: saved.url,
+                    type: saved.type,
+                    size: saved.size,
+                    name: String(payload.fileName ?? 'image').replace(/[\r\n]/g, '').slice(0, 100),
+                },
+            };
+
+            try {
+                await pushMessage(room.key, message);
+            } catch (err) {
+                console.error('failed to save file message:', err);
+                await deleteUpload(saved.url);   // don't leave an orphan on disk
+                return reply({ ok: false, error: 'Could not send file.' });
             }
 
             io.to(room.key).emit('message:new', message);

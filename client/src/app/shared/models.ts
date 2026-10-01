@@ -20,6 +20,13 @@ export interface Member {
   role: 'Admin' | 'Member';
 }
 
+export interface Attachment {
+  url: string;
+  type: string;
+  size: number;
+  name: string;
+}
+
 export interface Message {
   id: string;
   authorId: string;
@@ -27,6 +34,7 @@ export interface Message {
   initials: string;
   timestamp: string;
   text: string;
+  attachment?: Attachment;
 }
 
 export interface RoomNotice {

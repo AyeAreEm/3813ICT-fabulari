@@ -11,10 +11,22 @@
   background: #fdf0f0;
 }
 
-/* Inline "X joined / left the room" notices (R15) */
 .fab-room-notice {
   text-align: center;
   font-size: 0.8rem;
   font-style: italic;
   color: var(--fab-muted);
+}
+
+.fab-message__image-link {
+  display: inline-block;
+  margin-top: 4px;
+}
+
+.fab-message__image {
+  display: block;
+  max-width: 320px;
+  max-height: 320px;
+  border-radius: 8px;
+  object-fit: contain;
 }

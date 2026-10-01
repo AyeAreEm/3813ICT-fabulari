@@ -19,7 +19,19 @@
                 <span class="fab-message__author">{{ item.message.authorName }}</span>
                 <span class="fab-message__time">{{ item.message.timestamp | date: 'shortTime' }}</span>
               </div>
-              <p class="fab-message__text">{{ item.message.text }}</p>
+              <p class="fab-message__text" *ngIf="item.message.text">{{ item.message.text }}</p>
+
+              <a *ngIf="item.message.attachment as a"
+                class="fab-message__image-link"
+                [href]="attachmentUrl(a.url)"
+                target="_blank"
+              rel="noopener">
+
+                <img class="fab-message__image"
+                  [src]="attachmentUrl(a.url)"
+                  [alt]="a.name"
+                (load)="onImageLoad()" />
+              </a>
             </div>
           </div>
 
@@ -36,7 +48,7 @@
             <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
           </svg>
         </button>
-        <input #fileInput type="file" hidden (change)="onFileSelected($event)" />
+        <input #fileInput type="file" accept="image/png,image/jpeg,image/gif" hidden (change)="onFileSelected($event)" />
         <input class="fab-composer-input" [(ngModel)]="draft" placeholder="Message…" autocomplete="off" (keydown.enter)="sendMessage()" />
         <button type="button" class="fab-composer-send" aria-label="Send message" (click)="sendMessage()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5">
