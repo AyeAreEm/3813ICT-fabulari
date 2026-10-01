@@ -59,7 +59,7 @@ export async function attachChat(httpServer, { findUserByEmail, findGroupById })
     io.use(async (socket, next) => {
         const email = socket.handshake.auth?.email;
         const user = typeof email === 'string' ? await findUserByEmail(email) : null;
-        if (!user) return next(new Error('unauthorized'));
+        if (!user || user.isBanned) return next(new Error('unauthorized'));
 
         socket.data.user = {
             id: user.email,

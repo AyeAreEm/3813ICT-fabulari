@@ -6,7 +6,10 @@
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
       <div class="mb-3">
         <label class="form-label">User to ban:</label>
-        <input class="form-control fab-input" formControlName="userToBan" />
+        <input *ngIf="targetId" class="form-control fab-input" [value]="targetName" disabled />
+        <select *ngIf="!targetId" class="form-select fab-input" formControlName="userToBan">
+          <option *ngFor="let m of members()" [value]="m.id">{{ m.name }}</option>
+        </select>
       </div>
 
       <div class="mb-3">
@@ -20,6 +23,7 @@
                   placeholder="Provide detail regarding severe violations, terms of service breaches, or malicious behaviors…"></textarea>
       </div>
 
+      <p *ngIf="error()" class="text-danger small">{{ error() }}</p>
       <button type="submit" class="btn-fab-dark w-100">Submit Request</button>
     </form>
 

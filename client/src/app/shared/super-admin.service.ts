@@ -33,10 +33,10 @@ export class AdminService {
     return this.http.get<BanRequest[]>(`${apiUrl}/admin/ban-requests`);
   }
   banUser(id: string): Observable<void> {
-    return this.http.post<void>(`${apiUrl}/admin/ban-requests/${id}/ban`, {});
+    return this.http.patch<void>(`${apiUrl}/admin/ban-requests/${id}`, {ban: true});
   }
-  dismissBanFlag(id: string): Observable<void> {
-    return this.http.post<void>(`${apiUrl}/admin/ban-requests/${id}/dismiss`, {});
+  denyBanRequest(id: string): Observable<void> {
+    return this.http.patch<void>(`${apiUrl}/admin/ban-requests/${id}`, {ban: false});
   }
 
   submitBanRequest(payload: { userToBan: string; requestFrom: string; reason: string }): Observable<void> {

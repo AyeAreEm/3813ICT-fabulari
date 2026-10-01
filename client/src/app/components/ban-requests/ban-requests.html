@@ -1,22 +1,23 @@
 <app-admin-shell>
   <div class="fab-admin-list-header">
     <h2 class="fab-admin-list-title fab-serif">Ban Requests</h2>
-    <span class="fab-admin-list-sub">{{ requests.length }} pending moderation flags</span>
+    <span class="fab-admin-list-sub">{{ requests().length }} pending moderation flags</span>
   </div>
 
-  <div class="fab-admin-card" *ngFor="let r of requests" (click)="view(r)" role="button">
+  <div class="fab-admin-card" *ngFor="let r of requests()" (click)="view(r)" role="button">
     <div>
-      <div class="fab-admin-card__meta">Proposed by: {{ r.proposedByName }} ({{ r.proposedByRole }}) &middot; {{ r.date }}</div>
+      <div class="fab-admin-card__meta">Proposed by: {{ r.proposedByName }} ({{ r.proposedByRole }}) &middot; {{ r.date | date:'mediumDate' }}</div>
       <div class="fab-admin-card__title">Ban Target: {{ r.targetName }}</div>
       <p class="fab-admin-card__msg">&ldquo;{{ r.evidence }}&rdquo;</p>
     </div>
     <div class="fab-admin-card__actions" (click)="$event.stopPropagation()">
-      <button type="button" class="btn-fab-dark" (click)="view(r)">Approve</button>
+      <button type="button" class="btn-fab-dark" (click)="banUser(r)">Approve</button>
       <button type="button" class="btn-fab-outline-muted" (click)="deny(r)">Deny</button>
     </div>
   </div>
 
-  <p *ngIf="!requests.length" class="text-muted">No pending ban requests.</p>
+  <p *ngIf="error()" class="text-danger">{{ error() }}</p>
+  <p *ngIf="!requests().length" class="text-muted">No pending ban requests.</p>
 </app-admin-shell>
 
 <app-modal *ngIf="selected as r" (closed)="close()" maxWidth="520px">
@@ -42,6 +43,6 @@
 
   <div class="d-flex gap-2 mt-4">
     <button type="button" class="btn-fab-danger flex-fill" (click)="banUser(r)">Ban User</button>
-    <button type="button" class="btn-fab-light flex-fill" (click)="dismissFlag(r)">Dismiss Flag</button>
+    <button type="button" class="btn-fab-light flex-fill" (click)="deny(r)">Deny Request</button>
   </div>
 </app-modal>

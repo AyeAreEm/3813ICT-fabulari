@@ -1,8 +1,8 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Member } from '../../shared/models';
+import { AuthService } from '../../shared/auth.service';
 import { GroupService } from '../../shared/group.service';
 
 @Component({
@@ -13,10 +13,14 @@ import { GroupService } from '../../shared/group.service';
 })
 export class KickRequestComponent implements OnInit {
   private fb = inject(FormBuilder);
-  constructor(private route: ActivatedRoute, private groupService: GroupService) {}
+  private auth = inject(AuthService);
+  private groupService = inject(GroupService);
+
+  @Input({ required: true }) groupId!: string;
+  @Output() closed = new EventEmitter<void>();
 
   members = signal<Member[]>([]);
-  groupId = '';
+  error = signal('');
 
   form = this.fb.group({
     memberId: ['', Validators.required],
@@ -24,13 +28,13 @@ export class KickRequestComponent implements OnInit {
   });
 
   ngOnInit() {
-    this.groupId = this.route.snapshot.paramMap.get('id') ?? '';
-    if (this.members().length) {
-      this.form.patchValue({ memberId: this.members()[0].id });
-    }
-
     this.groupService.getMembers(this.groupId).subscribe(ms => {
-      this.members.set(ms);
+      console.log(ms);
+      const eligible = ms.filter(m => m.role !== 'Admin' && m.id !== this.auth.currentUser?.email);
+      this.members.set(eligible);
+      if (eligible.length) {
+        this.form.patchValue({ memberId: eligible[0].id });
+      }
     });
   }
 
@@ -39,7 +43,11 @@ export class KickRequestComponent implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
-    console.log('kick request', this.groupId, this.form.value);
-    // TODO: GroupService.requestKick(...)
+
+    const { memberId, reason } = this.form.value;
+    this.groupService.requestKick(this.groupId, memberId!, reason!).subscribe({
+      next: () => this.closed.emit(),
+      error: (err) => this.error.set(err.error?.status ?? 'Could not submit the request.'),
+    });
   }
 }

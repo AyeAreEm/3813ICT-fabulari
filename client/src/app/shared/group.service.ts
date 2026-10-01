@@ -41,7 +41,16 @@ export class GroupService {
   }
 
   requestKick(groupId: string, memberId: string, reason: string): Observable<void> {
-    return this.http.post<void>(`${apiUrl}/groups/${groupId}/kick-requests`, { memberId, reason });
+    return this.http.post<void>(`${apiUrl}/groups/${groupId}/kick-requests`, { userId: this.auth.currentUser?.email!, memberId, reason });
+  }
+
+  requestBan(groupId: string, targetId: string, reason: string, sourceKickRequestId?: string): Observable<void> {
+    return this.http.post<void>(`${apiUrl}/groups/${groupId}/ban-requests`, {
+      requestorId: this.auth.currentUser?.email!,
+      targetId,
+      reason,
+      sourceKickRequestId,
+    });
   }
 
   requestRoom(groupId: string, name: string, reason: string): Observable<void> {
@@ -58,10 +67,6 @@ export class GroupService {
 
   denyRequest(groupId: string, requestId: string, actor: string): Observable<void> {
     return this.http.patch<void>(`${apiUrl}/groups/${groupId}/requests/${requestId}`, {actor, approve: false});
-  }
-
-  escalateBan(groupId: string, requestId: string): Observable<void> {
-    return this.http.post<void>(`${apiUrl}/groups/${groupId}/requests/${requestId}/escalate-ban`, {});
   }
 
   updateSettings(groupId: string, payload: { description: string; colour: string }): Observable<Group> {

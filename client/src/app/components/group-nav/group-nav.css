@@ -24,3 +24,5 @@
   background: #f5f4f1;
   color: var(--fab-ink);
 }
+
+.fab-groupnav__action { width: 100%; background: none; border: 0; text-align: left; font: inherit; }

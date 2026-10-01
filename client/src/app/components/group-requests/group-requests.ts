@@ -2,6 +2,8 @@ import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { ModalComponent } from '../modal/modal';
+import { BanRequestComponent } from '../ban-request/ban-request';
 import { ShellComponent } from '../shell/shell';
 import { GroupNavComponent } from '../group-nav/group-nav';
 import { Group, GroupRequest, Room, Member } from '../../shared/models';
@@ -9,7 +11,7 @@ import { AuthService } from '../../shared/auth.service';
 import { GroupService } from '../../shared/group.service';
 
 @Component({
-  imports: [CommonModule, ShellComponent, GroupNavComponent],
+  imports: [CommonModule, ShellComponent, GroupNavComponent, ModalComponent, BanRequestComponent],
   selector: 'app-group-requests',
   styleUrl: './group-requests.css',
   templateUrl: './group-requests.html',
@@ -21,6 +23,7 @@ export class GroupRequestsComponent implements OnInit, OnDestroy {
   requests = signal<GroupRequest[]>([]);
   members = signal<Member[]>([]);
   currentId = "";
+  banTarget = signal<GroupRequest | null>(null);
 
   private paramSub?: Subscription;
 
@@ -71,7 +74,6 @@ export class GroupRequestsComponent implements OnInit, OnDestroy {
   }
 
   approve(req: GroupRequest) {
-    console.log('approve', req);
     this.groupService.approveRequest(this.currentId, req.id, this.auth.currentUser?.email!).subscribe(() => {
       if (req.type === 'room') {
         this.groupService.getRooms(this.currentId).subscribe(rs => {
@@ -80,6 +82,10 @@ export class GroupRequestsComponent implements OnInit, OnDestroy {
       }
     });
     this.remove(req);
+
+    if (req.type === 'kick') {
+      this.groupService.getMembers(this.currentId).subscribe(ms => this.members.set(ms));
+    }
   }
 
   deny(req: GroupRequest) {
@@ -89,9 +95,16 @@ export class GroupRequestsComponent implements OnInit, OnDestroy {
   }
 
   ban(req: GroupRequest) {
-    console.log('escalate ban', req);
-    // TODO: routes to something like /ban-request prefilled with req.subjectName
-    this.remove(req);
+    this.banTarget.set(req);
+  }
+
+  closeBan() {
+    this.banTarget.set(null);
+  }
+
+  onBanSubmitted() {
+    const req = this.banTarget();
+    if (req) this.remove(req);
   }
 
   private remove(req: GroupRequest) {

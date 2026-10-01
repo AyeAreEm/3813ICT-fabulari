@@ -11,6 +11,9 @@
           <h3 class="fab-request-title">{{ typeLabel(r.type) }}: {{ r.subjectName }}</h3>
           <span class="fab-request-date">{{ r.date | date:'yyyy-MM-dd h:mm a' }}</span>
         </div>
+
+        <p *ngIf="r.type === 'kick'" class="text-muted small mb-1">Requested by {{ r.requesterName }}</p>
+
         <p class="fab-request-message">&ldquo;{{ r.message }}&rdquo;</p>
         <div class="d-flex gap-2">
           <button type="button" class="btn-fab-dark flex-fill" (click)="approve(r)">Approve</button>
@@ -23,3 +26,14 @@
     </div>
   </div>
 </app-shell>
+
+<app-modal *ngIf="banTarget() as t" (closed)="closeBan()">
+  <app-ban-request
+    [groupId]="currentId"
+    [targetId]="t.targetId ?? null"
+    [targetName]="t.subjectName"
+    [sourceKickRequestId]="t.id"
+    [reason]="t.message"
+    (submitted)="onBanSubmitted()"
+    (closed)="closeBan()"></app-ban-request>
+</app-modal>

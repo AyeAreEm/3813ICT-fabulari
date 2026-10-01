@@ -9,6 +9,7 @@
         <select class="form-select fab-input" formControlName="memberId">
           <option *ngFor="let m of members()" [value]="m.id">{{ m.name }}</option>
         </select>
+        <p *ngIf="!members().length" class="text-muted small mt-2 mb-0">There are no other members to request a kick for.</p>
       </div>
 
       <div class="mb-4">
@@ -17,7 +18,9 @@
                   placeholder="Describe the reason for requesting a kick from the group…"></textarea>
       </div>
 
-      <button type="submit" class="btn-fab-dark w-100">Submit Request</button>
+      <p *ngIf="error()" class="text-danger small">{{ error() }}</p>
+
+      <button type="submit" class="btn-fab-dark w-100" [disabled]="!members().length">Submit Request</button>
     </form>
 
     <p class="text-center text-muted mt-3 mb-0 small">This request will be reviewed by the Group Admin.</p>

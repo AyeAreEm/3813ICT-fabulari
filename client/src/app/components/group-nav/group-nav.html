@@ -3,6 +3,9 @@
   <a [routerLink]="['/groups', groupId]" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="fab-groupnav__item">Details</a>
   <a *ngIf="isGroupAdmin" [routerLink]="['/groups', groupId, 'requests']" routerLinkActive="active" class="fab-groupnav__item">Requests</a>
 
+  <button *ngIf="!isGroupAdmin" type="button" class="fab-groupnav__item fab-groupnav__action" (click)="openKick()">Request Kick</button>
+  <button *ngIf="isGroupAdmin" type="button" class="fab-groupnav__item fab-groupnav__action" (click)="openBan()">Request Ban</button>
+
   <div class="fab-groupnav__rooms-header mt-4">
     <div class="fab-sidebar__label mb-0">Rooms</div>
     <button type="button" class="fab-groupnav__add-btn" (click)="openCreateRoom()" aria-label="Request a new room">
@@ -20,4 +23,12 @@
 
 <app-modal *ngIf="showCreateRoom" (closed)="closeCreateRoom()">
   <app-create-room-request [groupId]="groupId" (closed)="closeCreateRoom()"></app-create-room-request>
+</app-modal>
+
+<app-modal *ngIf="showKick" (closed)="closeKick()">
+  <app-kick-request [groupId]="groupId" (closed)="closeKick()"></app-kick-request>
+</app-modal>
+
+<app-modal *ngIf="showBan" (closed)="closeBan()">
+  <app-ban-request [groupId]="groupId" (closed)="closeBan()"></app-ban-request>
 </app-modal>

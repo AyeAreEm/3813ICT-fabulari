@@ -53,6 +53,8 @@ export interface GroupRequest {
   id: string;
   type: GroupRequestType;
   subjectName: string; // person name for join/kick, room name for 'room'
+  targetId?: string; // kick only: email of the member the kick is aimed at
+  requesterName?: string; // kick only: who submitted the request
   message: string;
   date: string;
 }
