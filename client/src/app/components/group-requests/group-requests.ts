@@ -72,7 +72,7 @@ export class GroupRequestsComponent implements OnInit, OnDestroy {
 
   approve(req: GroupRequest) {
     console.log('approve', req);
-    this.groupService.approveRequest(this.currentId, req.id).subscribe(() => {
+    this.groupService.approveRequest(this.currentId, req.id, this.auth.currentUser?.email!).subscribe(() => {
       if (req.type === 'room') {
         this.groupService.getRooms(this.currentId).subscribe(rs => {
           this.rooms = rs;
@@ -84,7 +84,7 @@ export class GroupRequestsComponent implements OnInit, OnDestroy {
 
   deny(req: GroupRequest) {
     console.log('deny', req);
-    this.groupService.denyRequest(this.currentId, req.id).subscribe();
+    this.groupService.denyRequest(this.currentId, req.id, this.auth.currentUser?.email!).subscribe();
     this.remove(req);
   }
 

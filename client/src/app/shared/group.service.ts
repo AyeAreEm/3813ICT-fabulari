@@ -52,12 +52,12 @@ export class GroupService {
     return this.http.get<GroupRequest[]>(`${apiUrl}/groups/${groupId}/requests`);
   }
 
-  approveRequest(groupId: string, requestId: string): Observable<void> {
-    return this.http.patch<void>(`${apiUrl}/groups/${groupId}/requests/${requestId}`, {approve: true});
+  approveRequest(groupId: string, requestId: string, actor: string): Observable<void> {
+    return this.http.patch<void>(`${apiUrl}/groups/${groupId}/requests/${requestId}`, {actor, approve: true});
   }
 
-  denyRequest(groupId: string, requestId: string): Observable<void> {
-    return this.http.patch<void>(`${apiUrl}/groups/${groupId}/requests/${requestId}`, {approve: false});
+  denyRequest(groupId: string, requestId: string, actor: string): Observable<void> {
+    return this.http.patch<void>(`${apiUrl}/groups/${groupId}/requests/${requestId}`, {actor, approve: false});
   }
 
   escalateBan(groupId: string, requestId: string): Observable<void> {

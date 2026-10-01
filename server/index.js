@@ -21,12 +21,19 @@ function groupRequestsCollection() {
 function createGroupRequestsCollection() {
     return getDB().collection('createGroupRequests');
 }
+function logsCollection() {
+    return getDB().collection('logs');
+}
 
 async function findUserByEmail(email) {
     return usersCollection().findOne({ email }, { projection: { _id: 0 } });
 }
 async function findGroupById(id) {
     return groupsCollection().findOne({ id }, { projection: { _id: 0 } });
+}
+
+async function log(actor, action) {
+    await logsCollection().insertOne({dateTime: Date.now(), actor, action});
 }
 
 app.use(express.json());
@@ -42,8 +49,10 @@ app.post('/auth/signup', async (req, res) => {
         return;
     }
 
+
     const newuser = {firstName, lastName, dob, email, password, isSuperAdmin: false};
     await usersCollection().insertOne({ ...newuser });
+
     res.json(newuser);
 });
 
@@ -89,6 +98,10 @@ app.patch('/create-group-requests/:id', async (req, res) => {
                 role: 'Admin',
             }],
         });
+
+        await log("Super Admin", "Approved Create Group Request: " + request.proposedTitle);
+    } else {
+        await log("Super Admin", "Denied Create Group Request: " + request.prosedTitle);
     }
 
     await createGroupRequestsCollection().deleteOne({ id: req.params.id });
@@ -165,19 +178,25 @@ app.patch('/groups/:gid/requests/:rid', async (req, res) => {
         return;
     }
 
-    if (request.type === 'join') {
-        if (req.body.approve) {
-            let user = await findUserByEmail(request.userId);
+    let group = await findGroupById(req.params.gid);
 
+    if (request.type === 'join') {
+        let user = await findUserByEmail(request.userId);
+        let name = user.firstName + " " + user.lastName;
+
+        if (req.body.approve) {
             await groupsCollection().updateOne(
                 { id: req.params.gid },
                 { $push: { members: {
                     id: request.userId,
-                    name: user.firstName + " " + user.lastName,
+                    name: name,
                     initials: user.firstName[0] + user.lastName[0],
                     role: 'Member',
                 } } },
             );
+            await logs(req.body.actor, "Approved Join (" + group.name + "): " + name);
+        } else {
+            await logs(req.body.actor, "Denied Join (" + group.name + "): " + name);
         }
     } else if (request.type === 'room') {
         if (req.body.approve) {
@@ -188,6 +207,9 @@ app.patch('/groups/:gid/requests/:rid', async (req, res) => {
                     name: request.roomName,
                 } } },
             );
+            await logs(req.body.actor, "Approved Room (" + group.name + "): " + request.roomName);
+        } else {
+            await logs(req.body.actor, "Denied Room (" + group.name + "): " + request.roomName);
         }
     }
 
@@ -246,6 +268,11 @@ app.get('/profile/:id/groups', async (req, res) => {
 
     res.json(sanitized);
 });
+
+app.get('/admin/logs', async (req, res) => {
+    let logs = await logsCollection().find({}, {projection: { _id: 0 }}).toArray();
+    res.json(logs);
+})
 
 const server = createServer(app);
 

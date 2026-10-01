@@ -90,7 +90,6 @@ export interface AuditLogEntry {
   dateTime: string;
   actor: string;
   action: string;
-  metadata: string;
 }
 
 export interface AuthUser {

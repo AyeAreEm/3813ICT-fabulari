@@ -37,7 +37,7 @@
           </svg>
         </button>
         <input #fileInput type="file" hidden (change)="onFileSelected($event)" />
-        <input class="fab-composer-input" [(ngModel)]="draft" placeholder="Message …" autocomplete="off" (keydown.enter)="sendMessage()" />
+        <input class="fab-composer-input" [(ngModel)]="draft" placeholder="Message…" autocomplete="off" (keydown.enter)="sendMessage()" />
         <button type="button" class="fab-composer-send" aria-label="Send message" (click)="sendMessage()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5">
             <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
