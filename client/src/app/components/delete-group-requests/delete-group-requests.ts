@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { AdminShellComponent } from '../admin-shell/admin-shell';
 import { ModalComponent } from '../modal/modal';
 import { DeleteGroupRequest } from '../../shared/models';
-import { MOCK_DELETE_REQUESTS } from '../../shared/mock-data';
 
 @Component({
   imports: [CommonModule, AdminShellComponent, ModalComponent],
@@ -12,7 +11,7 @@ import { MOCK_DELETE_REQUESTS } from '../../shared/mock-data';
   templateUrl: './delete-group-requests.html',
 })
 export class DeleteGroupRequestsComponent {
-  requests: DeleteGroupRequest[] = [...MOCK_DELETE_REQUESTS];
+  requests: DeleteGroupRequest[] = [];
   selected: DeleteGroupRequest | null = null;
 
   view(req: DeleteGroupRequest) { this.selected = req; }

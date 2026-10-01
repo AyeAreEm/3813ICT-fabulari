@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { AdminShellComponent } from '../admin-shell/admin-shell';
 import { ModalComponent } from '../modal/modal';
 import { BanRequest } from '../../shared/models';
-import { MOCK_BAN_REQUESTS } from '../../shared/mock-data';
 
 @Component({
   imports: [CommonModule, AdminShellComponent, ModalComponent],
@@ -12,7 +11,7 @@ import { MOCK_BAN_REQUESTS } from '../../shared/mock-data';
   templateUrl: './ban-requests.html',
 })
 export class BanRequestsComponent {
-  requests: BanRequest[] = [...MOCK_BAN_REQUESTS];
+  requests: BanRequest[] = [];
   selected: BanRequest | null = null;
 
   view(req: BanRequest) { this.selected = req; }
