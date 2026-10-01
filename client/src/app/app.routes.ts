@@ -16,9 +16,10 @@ import { BanRequestsComponent } from './components/ban-requests/ban-requests';
 import { AdminLogsComponent } from './components/admin-logs/admin-logs';
 import { authGuard } from './shared/auth.guard';
 import { superAdminGuard } from './shared/super-admin.guard';
+import { homeGuard } from './shared/home.guard';
 
 export const routes: Routes = [
-  { path: '', component: HomeComponent },
+  { path: '', component: HomeComponent, canActivate: [homeGuard] },
   { path: 'login', component: LoginComponent },
   { path: 'signup', component: SignupComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
