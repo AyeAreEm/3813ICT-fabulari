@@ -5,7 +5,7 @@ import readline from 'readline/promises';
 import { stdin as input, stdout as output } from 'process';
 import { attachChat } from './chat.js';
 import { connectDB, getDB } from './db.js';
-import { initUploads, serveUpload, deleteUpload } from './files.js';
+import { initUploads, serveUpload, deleteUpload, saveImage } from './files.js';
 
 let chat = null;
 
@@ -82,7 +82,7 @@ async function purgeGroup(group) {
     chat?.evictGroup(group.id);
 }
 
-app.use(express.json());
+app.use(express.json({limit: '5mb'}));
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
@@ -148,6 +148,7 @@ app.patch('/create-group-requests/:id', async (req, res) => {
                 name: user.firstName + " " + user.lastName,
                 initials: user.firstName[0] + user.lastName[0],
                 role: 'Admin',
+                avatar: user.avatar,
             }],
             colour: "#ffffff",
         });
@@ -428,6 +429,7 @@ app.patch('/groups/:gid/requests/:rid', async (req, res) => {
                     name: name,
                     initials: user.firstName[0] + user.lastName[0],
                     role: 'Member',
+                    avatar: user.avatar,
                 } } },
             );
             await log(req.body.actor, "Approved Join (" + group.name + "): " + name);
@@ -518,6 +520,52 @@ app.patch('/groups/:id/settings', async (req, res) => {
     );
 
     res.status(200).send();
+});
+
+app.patch('/profile/:id', async (req, res) => {
+    const { form, avatar } = req.body;
+    let avatarUrl = avatar;
+
+    const existingUser = await findUserByEmail(req.params.id);
+
+    if (avatar && (avatar.startsWith('data:') || Buffer.isBuffer(avatar))) {
+        let buffer;
+        if (typeof avatar === 'string' && avatar.startsWith('data:')) {
+            const base64Data = avatar.split(',')[1];
+            buffer = Buffer.from(base64Data, 'base64');
+        } else {
+            buffer = Buffer.from(avatar);
+        }
+
+        const uploadResult = await saveImage(buffer);
+
+        if (uploadResult) {
+            if (existingUser?.avatar && existingUser.avatar.startsWith('/uploads/')) {
+                await deleteUpload(existingUser.avatar);
+            }
+            avatarUrl = uploadResult.url;
+        }
+    }
+
+    await usersCollection().updateOne(
+        { email: req.params.id },
+        { 
+            $set: { 
+                firstName: form.firstName, 
+                lastName: form.lastName, 
+                dob: form.dob, 
+                avatar: avatarUrl 
+            } 
+        }
+    );
+
+    await groupsCollection().updateMany(
+        { "members.id": req.params.id },
+        { $set: { "members.$.avatar": avatarUrl } }
+    );
+
+    const user = await findUserByEmail(req.params.id);
+    res.json(user);
 });
 
 app.get('/profile/:id/groups', async (req, res) => {

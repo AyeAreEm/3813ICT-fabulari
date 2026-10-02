@@ -31,14 +31,12 @@ export class CreateGroupRequestsComponent implements OnInit {
   close() { this.selected = null; }
 
   approve(req: CreateGroupRequest) {
-    console.log("approving");
     this.admin.approveCreateRequest(req.id).subscribe();
     this.remove(req);
   }
 
   deny(req: CreateGroupRequest) {
-    console.log('deny create', req);
-    // TODO: AdminService.denyGroupCreation(req.id)
+    this.admin.denyCreateRequest(req.id).subscribe({});
     this.remove(req);
   }
 

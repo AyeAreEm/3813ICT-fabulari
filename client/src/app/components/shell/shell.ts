@@ -23,6 +23,7 @@ export class ShellComponent implements OnInit {
   @ViewChild('notifWrap') notifWrap?: ElementRef<HTMLElement>;
 
   name = (this.auth.currentUser?.firstName ?? "") + " " + (this.auth.currentUser?.lastName ?? "");
+  avatar: string | null = null;
 
   @Input() groups: Group[] = [];
   @Input() activeGroupId: string | null = null;
@@ -32,13 +33,16 @@ export class ShellComponent implements OnInit {
   panelOpen = signal(false);
 
   ngOnInit() {
-    // Fetch now, then every 30s. A failed poll is skipped rather than ending the stream.
     timer(0, NOTIFICATION_POLL_MS).pipe(
       switchMap(() => this.notificationService.getNotifications().pipe(catchError(() => of(null)))),
       takeUntilDestroyed(this.destroyRef),
     ).subscribe((list) => {
       if (list) this.notifications.set(list);
     });
+
+    if (this.auth.currentUser?.avatar) {
+      this.avatar = this.attachmentUrl(this.auth.currentUser.avatar);
+    }
   }
 
   togglePanel() {
@@ -66,5 +70,10 @@ export class ShellComponent implements OnInit {
     if (this.panelOpen() && !this.notifWrap?.nativeElement.contains(event.target as Node)) {
       this.closePanel();
     }
+  }
+
+  private readonly serverOrigin = 'http://localhost:3000';
+  attachmentUrl(path: string): string {
+    return this.serverOrigin + path;
   }
 }

@@ -159,6 +159,16 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.scrollToBottom();
   }
 
+  getAvatar(id: string): string | null {
+    const m = this.members().find((m) => m.id === id);
+
+    if (m?.avatar) {
+      return this.attachmentUrl(m.avatar);
+    }
+
+    return null
+  }
+
   private readonly serverOrigin = 'http://localhost:3000';
 
   attachmentUrl(path: string): string {

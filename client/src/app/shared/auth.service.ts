@@ -24,7 +24,6 @@ export class AuthService {
   login(email: string | null | undefined, password: string | null | undefined): Observable<boolean> {
     return this.http.post<AuthUser>('http://localhost:3000/auth/login', { email, password }).pipe(
       map((res) => {
-        console.log(res);
         localStorage.setItem(this.storageKey, JSON.stringify(res));
         this.userSubject.next(res);
         return true;
@@ -57,6 +56,23 @@ export class AuthService {
   logout() {
     localStorage.removeItem(this.storageKey);
     this.userSubject.next(null);
+  }
+
+  updateProfile(
+    id: string,
+    form: {
+        firstName: string | null | undefined;
+        lastName: string | null | undefined;
+        dob: string | null | undefined;
+        email: string | null | undefined;
+    },
+    avatar: string | null
+  ) {
+    this.http.patch<void>('http://localhost:3000/profile/' + id, {form, avatar}).subscribe({
+      next: (res) => {
+        localStorage.setItem(this.storageKey, JSON.stringify(res));
+      }
+    });
   }
 
   private readFromStorage(): AuthUser | null {

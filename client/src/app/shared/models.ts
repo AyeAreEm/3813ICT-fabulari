@@ -18,6 +18,7 @@ export interface Member {
   name: string;
   initials: string;
   role: 'Admin' | 'Member';
+  avatar?: string;
 }
 
 export interface Attachment {
@@ -118,6 +119,7 @@ export interface AuthUser {
   dob?: string;
   initials: string;
   isSuperAdmin: boolean;
+  avatar?: string;
 }
 
 export interface SignupPayload {

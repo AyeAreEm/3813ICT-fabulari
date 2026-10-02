@@ -12,7 +12,6 @@ export async function initUploads() {
     await uploadsCollection().createIndex({ id: 1 }, { unique: true });
 }
 
-// Don't trust the client's declared type; check the magic bytes.
 function detectImageType(buf) {
     if (buf.length >= 8 && buf.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) {
         return 'image/png';
@@ -27,7 +26,6 @@ function detectImageType(buf) {
     return null;
 }
 
-// Returns { url, type, size } or null if the bytes aren't a supported image.
 export async function saveImage(buf) {
     const type = detectImageType(buf);
     if (!type) return null;
@@ -46,7 +44,6 @@ export async function deleteUpload(url) {
     }
 }
 
-// Express handler for GET /uploads/:id
 export async function serveUpload(req, res) {
     const doc = await uploadsCollection().findOne({ id: req.params.id }, { projection: { _id: 0 } });
     if (!doc) {
@@ -54,14 +51,13 @@ export async function serveUpload(req, res) {
         return;
     }
 
-    // Mongo returns Binary; unwrap it to a Buffer
     const bytes = Buffer.from(doc.data.buffer.subarray(0, doc.data.length()));
 
     res.set({
         'Content-Type': doc.type,
         'Content-Length': bytes.length,
         'X-Content-Type-Options': 'nosniff',
-        'Cache-Control': 'public, max-age=31536000, immutable',   // ids are random and never change
+        'Cache-Control': 'public, max-age=31536000, immutable',
     });
     res.send(bytes);
 }

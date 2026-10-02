@@ -18,7 +18,6 @@ export class AdminLogsComponent implements OnInit {
   ngOnInit(): void {
     this.admin.getLogs().subscribe({
       next: (ls) => {
-        console.log(ls);
         this.logs.set(ls);
       }
     })

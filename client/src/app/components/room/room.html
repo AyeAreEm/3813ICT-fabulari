@@ -13,7 +13,8 @@
       <div class="fab-room-messages" #messagesEl (scroll)="onScroll()">
         <ng-container *ngFor="let item of feed(); trackBy: trackFeedItem">
           <div class="fab-message" *ngIf="item.type === 'message'">
-            <span class="fab-avatar-sm">{{ item.message.initials }}</span>
+            <img *ngIf="getAvatar(item.message.authorId) as avatar" width="32" height="32" style="clip-path: circle();" [src]="avatar" />
+            <span *ngIf="!getAvatar(item.message.authorId)" class="fab-avatar-sm">{{ item.message.initials }}</span>
             <div>
               <div class="fab-message__meta">
                 <span class="fab-message__author">{{ item.message.authorName }}</span>
