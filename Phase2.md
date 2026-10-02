@@ -471,3 +471,39 @@ The socket connects with `auth: { email }`. Banned or unknown users are rejected
 | C19 | ProfileComponent | Submit valid form | `AuthService.updateProfile` called with the user's email and form values |
 | C20 | RoomComponent | Chat service emits a message | Message is added to `feed()` as type `message` |
 | C21 | RoomComponent | Open `/groups/g1/rooms/r1` | `ChatService.joinRoom` called with `g1` and `r1` |
+
+## Design Documents
+### Home
+![home page](storyboards/home.png)
+
+### Login
+![login page](storyboards/login.png)
+
+### Signup
+![signup page](storyboards/signup.png)
+
+### Profile
+![profile page](storyboards/profile.png)
+
+### Change Password
+![change password](storyboards/change_password.png)
+
+### Groups
+![browse groups](storyboards/browse_groups.png)
+![group join](storyboards/group_join.png)
+![group details](storyboards/group_details.png)
+![group settings](storyboards/group_settings.png)
+![group requests](storyboards/group_requests.png)
+
+### Room
+![room](storyboards/room.png)
+
+### Request Forms
+![kick request](storyboards/kick_request.png)
+![ban request](storyboards/ban_request.png)
+
+### Super Admin
+![create group requests](storyboards/create_group_requests.png)
+![delete group requests](storyboards/delete_group_requests.png)
+![ban requests](storyboards/ban_requests.png)
+![logs](storyboards/logs.png)
