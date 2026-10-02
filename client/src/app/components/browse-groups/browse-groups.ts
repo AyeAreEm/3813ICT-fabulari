@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -24,15 +24,23 @@ export class BrowseGroupsComponent implements OnInit {
   myGroups = signal<Group[]>([]);
   allGroups = signal<Group[]>([]);
 
+  groups = computed(() => {
+    const myGroupIds = new Set(this.myGroups().map(m => m.id));
+    return this.allGroups().map(g => ({
+      ...g,
+      isMember: myGroupIds.has(g.id)
+    }));
+  });
+
   ngOnInit() {
     this.groupService.getMyGroups().subscribe({
       next: (gs) => {
-        this.myGroups.set(gs)
+        this.myGroups.set(gs);
       }
     });
     this.groupService.getAllGroups().subscribe({
       next: (gs) => {
-        this.allGroups.update(_ => gs)
+        this.allGroups.set(gs);
       }
     })
   }

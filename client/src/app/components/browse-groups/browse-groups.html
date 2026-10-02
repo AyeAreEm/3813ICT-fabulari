@@ -10,7 +10,7 @@
       <button type="button" class="btn-fab-dark w-100">Create A Group</button>
     </div>
 
-    <app-group-card *ngFor="let g of allGroups()" [group]="g" (action)="onCardAction(g)"></app-group-card>
+    <app-group-card *ngFor="let g of groups()" [group]="g" (action)="onCardAction(g)"></app-group-card>
   </div>
 </app-shell>
 
