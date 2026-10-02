@@ -48,11 +48,33 @@
   <div class="text-danger small mt-1" *ngIf="successorError()">{{ successorError() }}</div>
   <div class="text-success small mt-1" *ngIf="successorNotice()">{{ successorNotice() }}</div>
 
-  <div class="fab-danger-box d-flex justify-content-between align-items-center">
-    <div>
-      <div class="fab-danger-title mb-1">Delete Group</div>
-      <div class="text-muted small">Permanently remove this group, all rooms, and conversation history.</div>
+  <div class="fab-danger-box">
+    <div class="d-flex justify-content-between align-items-center gap-3">
+      <div>
+        <div class="fab-danger-title mb-1">Delete Group</div>
+        <div class="text-muted small">Ask the Super Admin to permanently remove this group, all rooms, and conversation history.</div>
+      </div>
+      <button type="button" class="btn-fab-danger-outline flex-shrink-0"
+              *ngIf="!deletePending() && !showDeleteForm()" (click)="openDeleteForm()">
+        Request Deletion
+      </button>
+      <span class="text-muted small fw-semibold text-nowrap" *ngIf="deletePending()">Request pending</span>
     </div>
-    <button type="button" class="btn-fab-danger-outline" (click)="deleteGroup()">Delete</button>
+
+    <div class="mt-3" *ngIf="showDeleteForm()">
+      <label class="form-label small" for="deleteReason">Why should this group be deleted?</label>
+      <textarea id="deleteReason" class="form-control fab-input" rows="3" maxlength="500"
+              [(ngModel)]="deleteReason" [ngModelOptions]="{ standalone: true }"
+              placeholder="The Super Admin will see this reason when reviewing your request."></textarea>
+      <div class="d-flex gap-2 mt-2">
+        <button type="button" class="btn-fab-danger" [disabled]="deleteSubmitting()" (click)="requestDelete()">
+          {{ deleteSubmitting() ? 'Sending...' : 'Send Request' }}
+        </button>
+        <button type="button" class="btn-fab-light" [disabled]="deleteSubmitting()" (click)="cancelDeleteForm()">Cancel</button>
+      </div>
+    </div>
+
+    <div class="text-danger small mt-2" *ngIf="deleteError()">{{ deleteError() }}</div>
+    <div class="text-success small mt-2" *ngIf="deleteNotice()">{{ deleteNotice() }}</div>
   </div>
 </div>

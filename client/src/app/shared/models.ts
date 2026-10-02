@@ -95,6 +95,14 @@ export interface BanRequest {
   date: string;
 }
 
+export interface AppNotification {
+  id: string;
+  level: 'success' | 'warning' | 'info';
+  message: string;
+  date: number;
+  read: boolean;
+}
+
 export interface AuditLogEntry {
   id: string;
   dateTime: string;

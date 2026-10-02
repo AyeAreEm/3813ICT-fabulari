@@ -4,11 +4,35 @@
       <img width="100" height="50" src="fabulari-logo.png" alt="logo">
     </a>
     <a routerLink="/groups" class="text-decoration-none fab-navbar__title">Browse Groups</a>
-    <a routerLink="/profile" title="{{name}}" class="fab-navbar__avatar">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/>
-      </svg>
-    </a>
+    <div class="fab-navbar__right">
+      <div class="fab-notif" #notifWrap>
+        <button type="button" class="fab-notif__btn" (click)="togglePanel()"
+                aria-label="Notifications" [attr.aria-expanded]="panelOpen()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span class="fab-notif__badge" *ngIf="unreadCount() > 0">{{ unreadCount() > 9 ? '9+' : unreadCount() }}</span>
+        </button>
+
+        <div class="fab-notif__panel" *ngIf="panelOpen()" role="dialog" aria-label="Notifications">
+          <div class="fab-notif__header">Notifications</div>
+          <div class="fab-notif__empty" *ngIf="!notifications().length">You're all caught up.</div>
+          <div class="fab-notif__item" *ngFor="let n of notifications()"
+               [class.fab-notif__item--unread]="!n.read"
+               [class.fab-notif__item--success]="n.level === 'success'"
+               [class.fab-notif__item--warning]="n.level === 'warning'">
+            <div class="fab-notif__msg">{{ n.message }}</div>
+            <div class="fab-notif__time">{{ n.date | date:'medium' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <a routerLink="/profile" title="{{name}}" class="fab-navbar__avatar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/>
+        </svg>
+      </a>
+    </div>
   </header>
 
   <div class="fab-shell__body">

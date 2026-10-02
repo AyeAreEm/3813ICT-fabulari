@@ -32,6 +32,13 @@ export class GroupSettingsComponent implements OnInit {
   successorError = signal('');
   successorNotice = signal('');
 
+  deleteReason = '';
+  showDeleteForm = signal(false);
+  deletePending = signal(false);
+  deleteSubmitting = signal(false);
+  deleteError = signal('');
+  deleteNotice = signal('');
+
   form = this.fb.group({
     description: ['', Validators.required]
   });
@@ -49,6 +56,11 @@ export class GroupSettingsComponent implements OnInit {
     }
 
     this.successorId = this.successors[0]?.id ?? '';
+
+    this.groupService.getDeleteRequestStatus(this.group.id).subscribe({
+      next: (status) => this.deletePending.set(status.pending),
+      error: () => {},
+    });
   }
 
   selectColour(c: string) {
@@ -104,10 +116,44 @@ export class GroupSettingsComponent implements OnInit {
     });
   }
 
-  deleteGroup() {
-    console.log('delete group', this.group.id);
-    // TODO: GroupService.deleteGroup(...) then navigate away
+  openDeleteForm() {
+    this.deleteError.set('');
+    this.deleteNotice.set('');
+    this.showDeleteForm.set(true);
   }
+
+  cancelDeleteForm() {
+    this.showDeleteForm.set(false);
+    this.deleteReason = '';
+    this.deleteError.set('');
+  }
+
+  requestDelete() {
+    const reason = this.deleteReason.trim();
+    if (!reason) {
+      this.deleteError.set('Please give a reason for deleting this group.');
+      return;
+    }
+    if (this.deleteSubmitting()) return;
+
+    this.deleteSubmitting.set(true);
+    this.deleteError.set('');
+
+    this.groupService.requestGroupDeletion(this.group.id, reason).subscribe({
+      next: () => {
+        this.deleteSubmitting.set(false);
+        this.deletePending.set(true);
+        this.showDeleteForm.set(false);
+        this.deleteReason = '';
+        this.deleteNotice.set('Deletion request sent to the Super Admin. You will be notified of the outcome.');
+      },
+      error: (err) => {
+        this.deleteSubmitting.set(false);
+        if (err?.status === 409) this.deletePending.set(true);
+        this.deleteError.set(this.errorText(err, 'Could not send the deletion request. Please try again.'));
+      },
+    });
+   }
 
   private errorText(err: any, fallback: string): string {
     return err?.error?.status ?? err?.error?.message ?? fallback;

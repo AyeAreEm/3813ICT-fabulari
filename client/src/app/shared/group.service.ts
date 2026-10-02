@@ -77,7 +77,11 @@ export class GroupService {
     return this.http.post<void>(`${apiUrl}/groups/${groupId}/appoint-successor`, { memberId });
   }
 
-  deleteGroup(groupId: string): Observable<void> {
-    return this.http.delete<void>(`${apiUrl}/groups/${groupId}`);
+  requestGroupDeletion(groupId: string, reason: string): Observable<void> {
+    return this.http.post<void>(`${apiUrl}/groups/${groupId}/delete-requests`, { requesterId: this.auth.currentUser?.email!, reason });
+  }
+
+  getDeleteRequestStatus(groupId: string): Observable<{ pending: boolean; date: number | null }> {
+    return this.http.get<{ pending: boolean; date: number | null }>(`${apiUrl}/groups/${groupId}/delete-requests/pending`);
   }
 }

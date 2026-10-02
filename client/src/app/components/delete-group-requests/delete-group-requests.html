@@ -1,22 +1,23 @@
 <app-admin-shell>
   <div class="fab-admin-list-header">
     <h2 class="fab-admin-list-title fab-serif">Delete Requests</h2>
-    <span class="fab-admin-list-sub">{{ requests.length }} requests pending action</span>
+  <span class="fab-admin-list-sub">{{ requests().length }} requests pending action</span>
   </div>
 
-  <div class="fab-admin-card" *ngFor="let r of requests" (click)="view(r)" role="button">
+  <div class="fab-admin-card" *ngFor="let r of requests()" (click)="view(r)" role="button">
     <div>
-      <div class="fab-admin-card__meta">{{ r.requesterName }} &middot; {{ r.date }}</div>
+      <div class="fab-admin-card__meta">{{ r.requesterName }} &middot; {{ r.date | date:'mediumDate' }}</div>
       <div class="fab-admin-card__title fab-admin-card__title--danger">{{ r.groupName }}</div>
       <p class="fab-admin-card__msg">&ldquo;{{ r.reason }}&rdquo;</p>
     </div>
     <div class="fab-admin-card__actions" (click)="$event.stopPropagation()">
       <button type="button" class="btn-fab-dark" (click)="view(r)">Approve</button>
-      <button type="button" class="btn-fab-outline-muted" (click)="deny(r)">Deny</button>
+      <button type="button" class="btn-fab-outline-muted" [disabled]="busy()" (click)="deny(r)">Deny</button>
     </div>
   </div>
 
-  <p *ngIf="!requests.length" class="text-muted">No pending deletion requests.</p>
+  <p *ngIf="error()" class="text-danger">{{ error() }}</p>
+  <p *ngIf="!requests().length" class="text-muted">No pending deletion requests.</p>
 </app-admin-shell>
 
 <app-modal *ngIf="selected as r" (closed)="close()" maxWidth="520px">
@@ -41,7 +42,7 @@
   </div>
 
   <div class="d-flex gap-2 mt-4">
-    <button type="button" class="btn-fab-danger flex-fill" (click)="confirmDelete(r)">Confirm Delete</button>
-    <button type="button" class="btn-fab-light flex-fill" (click)="close()">Cancel</button>
+    <button type="button" class="btn-fab-danger flex-fill" [disabled]="busy()" (click)="confirmDelete(r)">{{ busy() ? 'Deleting...' : 'Confirm Delete' }}</button>
+    <button type="button" class="btn-fab-light flex-fill" [disabled]="busy()" (click)="close()">Cancel</button>
   </div>
 </app-modal>

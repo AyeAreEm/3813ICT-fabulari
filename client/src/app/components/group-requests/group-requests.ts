@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { BanRequestComponent } from '../ban-request/ban-request';
 import { ShellComponent } from '../shell/shell';
 import { GroupNavComponent } from '../group-nav/group-nav';
 import { Group, GroupRequest, Room, Member } from '../../shared/models';
@@ -10,7 +9,7 @@ import { AuthService } from '../../shared/auth.service';
 import { GroupService } from '../../shared/group.service';
 
 @Component({
-  imports: [CommonModule, ShellComponent, GroupNavComponent, BanRequestComponent],
+  imports: [CommonModule, ShellComponent, GroupNavComponent],
   selector: 'app-group-requests',
   styleUrl: './group-requests.css',
   templateUrl: './group-requests.html',

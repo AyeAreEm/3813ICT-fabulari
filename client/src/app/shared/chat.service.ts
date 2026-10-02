@@ -140,6 +140,7 @@ export class ChatService {
     socket.on('room:userJoined', (n: RoomNotice) => this.noticeSubject.next(n));
     socket.on('room:userLeft', (n: RoomNotice) => this.noticeSubject.next(n));
     socket.on('room:presence', (users: PresenceUser[]) => this.presenceSubject.next(users));
+    socket.on('group:deleted', () => this.errorSubject.next('This group has been deleted.'));
 
     return socket;
   }

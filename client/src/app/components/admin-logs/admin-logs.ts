@@ -1,12 +1,11 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminShellComponent } from '../admin-shell/admin-shell';
-import { ModalComponent } from '../modal/modal';
 import { AuditLogEntry } from '../../shared/models';
 import { AdminService } from '../../shared/super-admin.service';
 
 @Component({
-  imports: [CommonModule, AdminShellComponent, ModalComponent],
+  imports: [CommonModule, AdminShellComponent],
   selector: 'app-admin-logs',
   styleUrl: './admin-logs.css',
   templateUrl: './admin-logs.html',

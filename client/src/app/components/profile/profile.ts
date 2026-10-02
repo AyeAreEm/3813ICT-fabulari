@@ -38,6 +38,7 @@ export class ProfileComponent {
       this.form.markAllAsTouched();
       return;
     }
+
     console.log('profile save', this.form.getRawValue(), this.avatarPreview);
     // TODO: call UserService.updateProfile(...)
   }

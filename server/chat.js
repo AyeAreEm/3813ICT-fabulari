@@ -238,5 +238,17 @@ export async function attachChat(httpServer, { findUserByEmail, findGroupById })
         socket.on('disconnect', () => leaveCurrentRoom(socket));
     });
 
-    return io;
+    function evictGroup(groupId) {
+        for (const socket of io.sockets.sockets.values()) {
+            const room = socket.data.room;
+            if (room?.groupId !== groupId) continue;
+
+            socket.emit('group:deleted', { groupId });
+            socket.leave(room.key);
+            socket.data.room = null;
+            presence.delete(room.key);
+        }
+    }
+
+    return { io, evictGroup };
 }

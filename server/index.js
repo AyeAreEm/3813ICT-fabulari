@@ -5,7 +5,9 @@ import readline from 'readline/promises';
 import { stdin as input, stdout as output } from 'process';
 import { attachChat } from './chat.js';
 import { connectDB, getDB } from './db.js';
-import { initUploads, serveUpload } from './files.js';
+import { initUploads, serveUpload, deleteUpload } from './files.js';
+
+let chat = null;
 
 const app = express();
 const port = 3000;
@@ -25,6 +27,15 @@ function createGroupRequestsCollection() {
 function banRequestsCollection() {
     return getDB().collection('banRequests');
 }
+function deleteGroupRequestsCollection() {
+    return getDB().collection('deleteGroupRequests');
+}
+function notificationsCollection() {
+    return getDB().collection('notifications');
+}
+function messagesCollection() {
+    return getDB().collection('messages');
+}
 function logsCollection() {
     return getDB().collection('logs');
 }
@@ -41,6 +52,34 @@ function isGroupAdmin(group, email) {
 
 async function log(actor, action) {
     await logsCollection().insertOne({dateTime: Date.now(), actor, action});
+}
+
+async function notify(userId, level, message) {
+    await notificationsCollection().insertOne({
+        id: crypto.randomUUID(),
+        userId,
+        level,
+        message,
+        date: Date.now(),
+        read: false,
+    });
+}
+
+async function purgeGroup(group) {
+    const roomKeys = (group.rooms ?? []).map(r => group.id + ':' + r.id);
+
+    if (roomKeys.length > 0) {
+        const withFiles = await messagesCollection()
+            .find({ room: { $in: roomKeys }, attachment: { $exists: true } }, { projection: { attachment: 1 } })
+            .toArray();
+        await Promise.all(withFiles.map(m => deleteUpload(m.attachment.url)));
+        await messagesCollection().deleteMany({ room: { $in: roomKeys } });
+    }
+
+    await groupRequestsCollection().deleteMany({ groupId: group.id });
+    await groupsCollection().deleteOne({ id: group.id });
+
+    chat?.evictGroup(group.id);
 }
 
 app.use(express.json());
@@ -114,8 +153,10 @@ app.patch('/create-group-requests/:id', async (req, res) => {
         });
 
         await log("Super Admin", "Approved Create Group Request: " + request.proposedTitle);
+        await notify(request.requesterId, 'success', "Your request to create group \"" + request.proposedTitle + "\" was approved. Group has been created.");
     } else {
         await log("Super Admin", "Denied Create Group Request: " + request.proposedTitle);
+        await notify(request.requesterId, 'success', "Your request to create group \"" + request.proposedTitle + "\" was denied.");
     }
 
     await createGroupRequestsCollection().deleteOne({ id: req.params.id });
@@ -309,6 +350,52 @@ app.post('/groups/:id/ban-requests', async (req, res) => {
     res.status(200).send();
 });
 
+app.post('/groups/:id/delete-requests', async (req, res) => {
+    const { requesterId, reason } = req.body;
+
+    const group = await findGroupById(req.params.id);
+    if (!group) {
+        res.status(404).json({status: "Group not found."});
+        return;
+    }
+
+    if (!isGroupAdmin(group, requesterId)) {
+        res.status(403).json({status: "Only a Group Admin can request to delete this group."});
+        return;
+    }
+
+    if (typeof reason !== 'string' || !reason.trim()) {
+        res.status(400).json({status: "A reason is required."});
+        return;
+    }
+
+    const pending = await deleteGroupRequestsCollection().findOne({ groupId: group.id, status: 'pending' });
+    if (pending) {
+        res.status(409).json({status: "A deletion request for this group is already pending."});
+        return;
+    }
+
+    const requester = group.members.find(m => m.id === requesterId);
+
+    await deleteGroupRequestsCollection().insertOne({
+        id: crypto.randomUUID(),
+        groupId: group.id,
+        groupName: group.name,
+        requesterId,
+        requesterName: requester.name,
+        reason: reason.trim(),
+        status: 'pending',
+        date: Date.now(),
+    });
+
+    res.status(200).send();
+});
+
+app.get('/groups/:id/delete-requests/pending', async (req, res) => {
+    const pending = await deleteGroupRequestsCollection().findOne({ groupId: req.params.id, status: 'pending' }, { projection: { _id: 0 } });
+    res.json({ pending: pending !== null, date: pending?.date ?? null });
+});
+
 app.patch('/groups/:gid/requests/:rid', async (req, res) => {
     let request = await groupRequestsCollection().findOne({ id: req.params.rid }, { projection: { _id: 0 } });
 
@@ -344,8 +431,10 @@ app.patch('/groups/:gid/requests/:rid', async (req, res) => {
                 } } },
             );
             await log(req.body.actor, "Approved Join (" + group.name + "): " + name);
+            await notify(request.userId, 'success', "Your request to join \"" + group.name + "\" was approved.")
         } else {
             await log(req.body.actor, "Denied Join (" + group.name + "): " + name);
+            await notify(request.userId, 'warning', "Your request to join \"" + group.name + "\" was denied.");
         }
     } else if (request.type === 'room') {
         if (req.body.approve) {
@@ -357,8 +446,10 @@ app.patch('/groups/:gid/requests/:rid', async (req, res) => {
                 } } },
             );
             await log(req.body.actor, "Approved Room (" + group.name + "): " + request.roomName);
+            await notify(request.userId, 'success', "Your request for room \"" + request.roomName + "\" was approved. Room has been created.");
         } else {
             await log(req.body.actor, "Denied Room (" + group.name + "): " + request.roomName);
+            await notify(request.userId, 'warning', "Your request for room \"" + request.roomName + "\" was denied.");
         }
     } else if (request.type === 'kick') {
         let target = group.members.find(m => m.id === request.targetId);
@@ -370,8 +461,10 @@ app.patch('/groups/:gid/requests/:rid', async (req, res) => {
                 { $pull: { members: { id: request.targetId } } },
             );
             await log(req.body.actor, "Approved Kick (" + group.name + "): " + targetName);
+            await notify(request.userId, 'success', "Your kick request on \"" + group.name + "\" for \"" + targetName + "\" was approved. They have been kicked.");
         } else {
             await log(req.body.actor, "Denied Kick (" + group.name + "): " + targetName);
+            await notify(request.userId, 'success', "Your kick request on \"" + group.name + "\" for \"" + targetName + "\" was denied.");
         }
     }
 
@@ -510,6 +603,71 @@ app.patch('/admin/ban-requests/:id', async (req, res) => {
     res.status(200).send();
 });
 
+app.get('/admin/delete-requests', async (req, res) => {
+    let requests = await deleteGroupRequestsCollection().find({ status: 'pending' }, { projection: { _id: 0 } }).sort({ date: 1 }).toArray();
+
+    let sanitized = [];
+    for (let r of requests) {
+        sanitized.push({
+            id: r.id,
+            requesterName: r.requesterName,
+            groupName: r.groupName,
+            reason: r.reason,
+            date: r.date,
+        });
+    }
+
+    res.json(sanitized);
+});
+
+app.post('/admin/delete-requests/:id/confirm', async (req, res) => {
+    let request = await deleteGroupRequestsCollection().findOne({ id: req.params.id, status: 'pending' }, { projection: { _id: 0 } });
+    if (!request) {
+        res.status(404).json({status: "Request not found."});
+        return;
+    }
+
+   let group = await findGroupById(request.groupId);
+    if (group) {
+        await purgeGroup(group);
+    }
+
+    await deleteGroupRequestsCollection().updateOne({ id: request.id }, { $set: { status: 'approved', resolvedDate: Date.now() } });
+    await notify(request.requesterId, 'success', "Your request to delete \"" + request.groupName + "\" was approved.");
+    await log("Super Admin", "Approved Delete Group Request: " + request.groupName);
+
+    res.status(200).send();
+});
+
+app.post('/admin/delete-requests/:id/deny', async (req, res) => {
+    let request = await deleteGroupRequestsCollection().findOne({ id: req.params.id, status: 'pending' }, { projection: { _id: 0 } });
+    if (!request) {
+        res.status(404).json({status: "Request not found."});
+        return;
+    }
+
+    await deleteGroupRequestsCollection().updateOne({ id: request.id }, { $set: { status: 'denied', resolvedDate: Date.now() } });
+    await notify(request.requesterId, 'warning', "Your request to delete \"" + request.groupName + "\" was denied.");
+    await log("Super Admin", "Denied Delete Group Request: " + request.groupName);
+
+    res.status(200).send();
+});
+
+app.get('/notifications/:userId', async (req, res) => {
+    let notifications = await notificationsCollection()
+        .find({ userId: req.params.userId }, { projection: { _id: 0, userId: 0 } })
+        .sort({ date: -1 })
+        .limit(30)
+        .toArray();
+
+   res.json(notifications);
+});
+
+app.patch('/notifications/:userId/read', async (req, res) => {
+    await notificationsCollection().updateMany({ userId: req.params.userId, read: false }, { $set: { read: true } });
+    res.status(200).send();
+});
+
 app.get('/admin/logs', async (req, res) => {
     let logs = await logsCollection().find({}, {projection: { _id: 0 }}).toArray();
     res.json(logs);
@@ -527,7 +685,7 @@ try {
 
 await initUploads();
 
-await attachChat(server, { findUserByEmail, findGroupById });
+chat = await attachChat(server, { findUserByEmail, findGroupById });
 
 server.listen(port, async () => {
     console.log("running on " + port);

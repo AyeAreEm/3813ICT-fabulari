@@ -1,3 +1,45 @@
+:host {
+  display: block;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+:host app-shell {
+  display: block;
+  height: 100%;
+}
+
+:host ::ng-deep .fab-shell {
+  height: 100%;
+  min-height: 0;
+}
+
+/* Make sure each flex level can shrink below its content's height. */
+.fab-room-layout,
+.fab-room-main {
+  min-height: 0;
+}
+
+.fab-room-messages {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Messages overflow (and scroll) instead of being squished to fit. */
+.fab-message,
+.fab-room-notice {
+  flex-shrink: 0;
+}
+
+/* Header, status bars and composer keep their size; only messages flex. */
+.fab-room-header,
+.fab-room-status,
+.fab-room-composer {
+  flex-shrink: 0;
+}
+
 .fab-room-status {
   padding: 0.4rem 2rem;
   font-size: 0.82rem;
