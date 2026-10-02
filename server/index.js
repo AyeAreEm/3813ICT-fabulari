@@ -151,6 +151,7 @@ app.patch('/create-group-requests/:id', async (req, res) => {
                 avatar: user.avatar,
             }],
             colour: "#ffffff",
+            ageRestriction: request.ageRestriction,
         });
 
         await log("Super Admin", "Approved Create Group Request: " + request.proposedTitle);
@@ -175,7 +176,7 @@ app.get('/groups', async (req, res) => {
             name: g.name,
             description: g.description,
             memberCount: g.members.length,
-            ageRestriction: 13,
+            ageRestriction: g.ageRestriction,
             icon: "",
             isMember: false,
         });
@@ -191,7 +192,7 @@ app.get('/groups/:id', async (req, res) => {
         name: g.name,
         description: g.description,
         memberCount: g.members.length,
-        ageRestriction: 13,
+        ageRestriction: g.ageRestriction,
         icon: "",
         isMember: false,
         colour: g.colour,
@@ -578,7 +579,7 @@ app.get('/profile/:id/groups', async (req, res) => {
             name: g.name,
             description: g.description,
             memberCount: g.members.length,
-            ageRestriction: 13,
+            ageRestriction: g.ageRestriction,
             icon: "",
             isMember: true,
         });

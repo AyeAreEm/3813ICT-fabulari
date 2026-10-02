@@ -30,6 +30,8 @@
   </div>
 
   <button type="button" class="btn-fab-dark w-100" (click)="sendJoinRequest()">Send Join Request</button>
+  <br><br>
+  <p *ngIf="error()" class="text-danger small">{{ error() }}</p>
 </app-modal>
 
 <app-modal *ngIf="showCreateModal" (closed)="closeCreateModal()">

@@ -54,6 +54,7 @@ export class BrowseGroupsComponent implements OnInit {
     description: ['', Validators.required],
     minAge: [13, [Validators.required, Validators.min(0), Validators.max(99)]]
   });
+  error = signal('');
 
   onCardAction(group: Group) {
     if (group.isMember) {
@@ -69,6 +70,11 @@ export class BrowseGroupsComponent implements OnInit {
   }
 
   sendJoinRequest() {
+    if (this.calculateAge(this.auth.currentUser?.dob!) < parseInt(this.selectedGroup?.ageRestriction!)) {
+      this.error.set("Age limit is " + this.selectedGroup?.ageRestriction + ". Cannot join group.")
+      return;
+    }
+
     this.groupService.requestJoin(this.selectedGroup?.id!, this.joinMessage).subscribe();
     this.closeModal();
   }
@@ -96,7 +102,25 @@ export class BrowseGroupsComponent implements OnInit {
       date: Date.now() + "",
       ageRestriction: this.createForm.value.minAge!,
     };
+
     this.groupService.requestGroupCreation(request).subscribe();
     this.createForm.reset({ minAge: 13 });
     this.closeCreateModal();
-  }}
+  }
+
+  calculateAge(dob: string) {
+    const birthDate = new Date(dob);
+    const today = new Date();
+
+    let age = today.getFullYear() - birthDate.getFullYear();
+
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    const dayDiff = today.getDate() - birthDate.getDate();
+
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+      age--;
+    }
+
+    return age;
+  }
+}
